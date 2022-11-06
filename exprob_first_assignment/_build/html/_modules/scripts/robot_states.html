@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scripts.robot_states &mdash; first_exprob_assignment 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> first_exprob_assignment
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">first_exprob_assignment</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>scripts.robot_states</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scripts.robot_states</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: robot_states</span>
+<span class="sd">    :platform: Unix</span>
+<span class="sd">    :synopsis: Python module that keeps track of the robot position and issues &#39;battery_low&#39; messages either randomly or under the user request</span>
+
+<span class="sd">.. moduleauthor:: Emanuele Rambaldi &lt;emanuele.rambaldi3@studio.unibo.it&gt;</span>
+
+<span class="sd">This node defines two services to get and set the current robot pose, and a publisher to notify that the battery is low.</span>
+
+<span class="sd">Publishes to:</span>
+<span class="sd">    - /state/battery_low</span>
+
+<span class="sd">Service:</span>
+<span class="sd">    - /state/get_pose</span>
+<span class="sd">    - /state/set_pose</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="c1"># Import constant name defined to structure the architecture.</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/home/emanuelerambaldi/ROS/my_ros_ws/src/exprob_first_assignment/scripts&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">architecture_name_mapper</span> <span class="k">as</span> <span class="nn">anm</span>
+<span class="c1"># Import the messages used by services and publishers.</span>
+<span class="kn">from</span> <span class="nn">std_msgs.msg</span> <span class="kn">import</span> <span class="n">Bool</span>
+<span class="c1"># from arch_skeleton.srv import GetPose, GetPoseResponse, SetPose, SetPoseResponse</span>
+<span class="kn">from</span> <span class="nn">exprob_first_assignment.srv</span> <span class="kn">import</span> <span class="n">GetPose</span><span class="p">,</span> <span class="n">GetPoseResponse</span><span class="p">,</span> <span class="n">SetPose</span><span class="p">,</span> <span class="n">SetPoseResponse</span>
+
+
+<span class="c1"># A tag for identifying logs producer.</span>
+<span class="n">LOG_TAG</span> <span class="o">=</span> <span class="n">anm</span><span class="o">.</span><span class="n">NODE_ROBOT_STATE</span>
+
+
+<span class="c1"># The node manager class.</span>
+<span class="c1"># This class defines two services to get and set the current </span>
+<span class="c1"># robot pose, and a publisher to notify that the battery is low.</span>
+<div class="viewcode-block" id="RobotState"><a class="viewcode-back" href="../../index.html#scripts.robot_states.RobotState">[docs]</a><span class="k">class</span> <span class="nc">RobotState</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Class that is composed of several methods aimed at keeping track of the robot state (position and battery level).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; (constructor) Function that is called whenever an instance of this class is defined.</span>
+
+<span class="sd">        The function initalises the robot position and battery level and starts a parallel thread to run the method that manages the battery.</span>
+<span class="sd">        This management is carried out either manually or under request, based on the value of a parameter, here retrieved from the parameter server and stored in th &#39;_randomness&#39; variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Initialise this node.</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">NODE_ROBOT_STATE</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">rospy</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="c1"># Initialise robot position.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Initialise battery level.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_battery_low</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># low battery</span>
+        <span class="c1"># Initialise randomness, if enabled.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_randomness</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_RANDOM_ACTIVE</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomness</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_BATTERY_TIME</span><span class="p">,</span> <span class="p">[</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">])</span>
+            <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Random-based battery low notification active: the battery gets low with a &#39;</span> \
+                      <span class="s1">&#39;delay in the range of [</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">) seconds.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+        <span class="c1"># Define services.</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">Service</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">SERVER_GET_POSE</span><span class="p">,</span> <span class="n">GetPose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pose</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">Service</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">SERVER_SET_POSE</span><span class="p">,</span> <span class="n">SetPose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_pose</span><span class="p">)</span>
+        <span class="c1"># Start publisher on a separate thread.</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_battery_low</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="c1"># Log information.</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Initialise node `</span><span class="si">%s</span><span class="s1">` with services `</span><span class="si">%s</span><span class="s1">` and `</span><span class="si">%s</span><span class="s1">`, and topic </span><span class="si">%s</span><span class="s1">.&#39;</span> \
+                  <span class="o">%</span> <span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">NODE_ROBOT_STATE</span><span class="p">,</span> <span class="n">anm</span><span class="o">.</span><span class="n">SERVER_GET_POSE</span><span class="p">,</span> <span class="n">anm</span><span class="o">.</span><span class="n">SERVER_SET_POSE</span><span class="p">,</span> <span class="n">anm</span><span class="o">.</span><span class="n">TOPIC_BATTERY_LOW</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+
+    <span class="c1"># The `robot/set_pose` service implementation.</span>
+    <span class="c1"># The `request` input parameter is the current robot pose to be set,</span>
+    <span class="c1"># as given by the client. This server returns an empty `response`.</span>
+<div class="viewcode-block" id="RobotState.set_pose"><a class="viewcode-back" href="../../index.html#scripts.robot_states.RobotState.set_pose">[docs]</a>    <span class="k">def</span> <span class="nf">set_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Function that is called every time that a new client request related to the &#39;/state/set_pose&#39; service is received.</span>
+
+<span class="sd">        The robot position to be set is stored in a variable belonging to the class and an empty response is returned.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            request (Point): service request message containing the robot position to be set</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            response (empty): empty service response message</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">pose</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Store the new current robot position.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">pose</span>
+            <span class="c1"># Log information.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_info</span><span class="p">(</span><span class="s1">&#39;Set current robot position through `</span><span class="si">%s</span><span class="s1">` as (</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">)&#39;</span> \
+                             <span class="o">%</span> <span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">SERVER_SET_POSE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="s1">&#39;Cannot set an unspecified robot position&#39;</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+        <span class="c1"># Return an empty response.</span>
+        <span class="k">return</span> <span class="n">SetPoseResponse</span><span class="p">()</span></div>
+
+    <span class="c1"># The `robot/get_pose` service implementation.</span>
+    <span class="c1"># The `request` input parameter is given by the client as empty. Thus, it is not used.</span>
+    <span class="c1"># The `response` returned to the client contains the current robot pose.</span>
+<div class="viewcode-block" id="RobotState.get_pose"><a class="viewcode-back" href="../../index.html#scripts.robot_states.RobotState.get_pose">[docs]</a>    <span class="k">def</span> <span class="nf">get_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Function that is called every time that a new-client request related to the &#39;/state/get_pose&#39; service is received.</span>
+
+<span class="sd">        First, the required robot position is retrieved from a variable belonging to the class. Then, a response message is filled with such position and sent to the client.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            request (empty): empty service request message</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            response (Point): service response message containing the robot position to be retrieved</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Log information.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="s1">&#39;Cannot get an unspecified robot position&#39;</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Get current robot position through `</span><span class="si">%s</span><span class="s1">` as (</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">)&#39;</span> \
+                      <span class="o">%</span> <span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">SERVER_GET_POSE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_info</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
+        <span class="c1"># Create the response with the robot pose and return it.</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">GetPoseResponse</span><span class="p">()</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">pose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+    <span class="c1"># Publish changes of battery levels. This method runs on a separate thread.</span>
+    <span class="k">def</span> <span class="nf">_is_battery_low</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Function that is called in the class constructor and is run in a parallel thread.</span>
+
+<span class="sd">        It simply defines and initialises the publisher that publishes on the &#39;/state/battery_low&#39; topic and invokes one of the &#39;battery-management&#39; functions based on the value of the &#39;_randmoness&#39; variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Define a `latched` publisher to wait for initialisation and publish immediately.</span>
+        <span class="n">publisher</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Publisher</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">TOPIC_BATTERY_LOW</span><span class="p">,</span> <span class="n">Bool</span><span class="p">,</span> <span class="n">queue_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomness</span><span class="p">:</span>
+            <span class="c1"># Publish battery level changes randomly.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_notifier</span><span class="p">(</span><span class="n">publisher</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Publish battery level changes through a keyboard-based interface.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_manual_battery_notifier</span><span class="p">(</span><span class="n">publisher</span><span class="p">)</span>
+
+    <span class="c1"># Publish when the battery change state (i.e. low) based on a random</span>
+    <span class="c1"># delay within the interval [`self._random_battery_time[0]`, `self._random_battery_time[1]`).</span>
+    <span class="c1"># The message is published through the `publisher` input parameter and is a</span>
+    <span class="c1"># boolean value, i.e. `True`: battery low</span>
+    <span class="k">def</span> <span class="nf">_random_battery_notifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">publisher</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Function that is called by the &#39;_is_battery_low()&#39; method if the &#39;_randomness&#39; variable has value &#39;True&#39;.</span>
+
+<span class="sd">        It simply publishes &#39;battery_low&#39; messages on the &#39;/state/battery_low&#39; topic with a delay that, at every iteration, is randomly chosen in a predefined interval.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            publisher (rospy.Publisher): publisher that publishes on the &#39;/state/battery_low&#39; topic</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">delay</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Initialised to 0 just for logging purposes.</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+
+            <span class="c1"># Wait for simulate battery usage.</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+            <span class="c1"># Publish battery level (low).</span>
+            <span class="n">publisher</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_battery_low</span><span class="p">))</span>
+            <span class="c1"># Log state.</span>
+            <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Robot got low battery after </span><span class="si">%f</span><span class="s1"> seconds.&#39;</span> <span class="o">%</span> <span class="n">delay</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_info</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
+
+
+    <span class="c1"># Allow keyboard interaction to emulate battery level changes.</span>
+    <span class="c1"># The message is published through the `publisher` input parameter and is a</span>
+    <span class="c1"># boolean value, i.e., `True`: battery low, `False`: battery high.</span>
+    <span class="k">def</span> <span class="nf">_manual_battery_notifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">publisher</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Function that is called by the &#39;_is_battery_low()&#39; method if the &#39;_randomness&#39; variable has value &#39;False&#39;.</span>
+
+<span class="sd">        It simply prints a GUI on the screen and publishes &#39;battery_low&#39; messages on the &#39;/state/battery_low&#39; topic whenever the user says so.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            publisher (rospy.Publisher): publisher that publishes on the &#39;/state/battery_low&#39; topic</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Explain keyboard-based interaction.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  # Type `Low` (`L`) to notify that the battery is low.&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  # Type `cnt+C` and `Enter` to quit.&#39;</span><span class="p">)</span>
+        <span class="c1"># Loop to enable multiple interactions.</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+            <span class="c1"># Wait for the user to enter a battery state.</span>
+            <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39; &gt; &#39;</span><span class="p">)</span>
+            <span class="n">user_input</span> <span class="o">=</span> <span class="n">user_input</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="c1"># Understand the entered text.</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">user_input</span> <span class="o">==</span> <span class="s1">&#39;low&#39;</span> <span class="ow">or</span> <span class="n">user_input</span> <span class="o">==</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span>
+                <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="s1">&#39;Robot got low battery.&#39;</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Cannot understand the entered command.</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*** USER INPUT ERROR! Try again:&#39;</span><span class="p">)</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># Publish the massage based on the entered command.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">publisher</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_battery_low</span><span class="p">))</span>
+
+    <span class="c1"># Print logging only when random testing is active.</span>
+    <span class="c1"># This is done to allow an intuitive usage of the keyboard-based interface.</span>
+    <span class="k">def</span> <span class="nf">_print_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Function with logging purposes that is called after a &#39;battery_low&#39; message is issued when the &#39;battery-management&#39; is random.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            msg (str): message to be logged</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomness</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; Function that instantiates the &#39;RobotState()&#39; class and waits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Instantiate the node manager class and wait.</span>
+    <span class="n">RobotState</span><span class="p">()</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Emanuele Rambaldi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

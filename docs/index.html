@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to first_exprob_assignment’s documentation! &mdash; first_exprob_assignment 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> first_exprob_assignment
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to first_exprob_assignment’s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#module-scripts.robot_states">Robot States Module</a></li>
+<li><a class="reference internal" href="#module-scripts.planner">Planner Module</a></li>
+<li><a class="reference internal" href="#module-scripts.controller">Controller Module</a></li>
+<li><a class="reference internal" href="#module-scripts.state_machine">State Machine Module</a></li>
+<li><a class="reference internal" href="#module-scripts.custom_classes">Custom Classes Module</a></li>
+<li><a class="reference internal" href="#module-scripts.architecture_name_mapper">Architecture Name Mapper Module</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">first_exprob_assignment</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>Welcome to first_exprob_assignment’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="welcome-to-first-exprob-assignment-s-documentation">
+<h1>Welcome to first_exprob_assignment’s documentation!<a class="headerlink" href="#welcome-to-first-exprob-assignment-s-documentation" title="Permalink to this headline"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="module-scripts.robot_states">
+<span id="robot-states-module"></span><h1>Robot States Module<a class="headerlink" href="#module-scripts.robot_states" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-robot_states"></span><p>This node defines two services to get and set the current robot pose, and a publisher to notify that the battery is low.</p>
+<dl class="simple">
+<dt>Publishes to:</dt><dd><ul class="simple">
+<li><p>/state/battery_low</p></li>
+</ul>
+</dd>
+<dt>Service:</dt><dd><ul class="simple">
+<li><p>/state/get_pose</p></li>
+<li><p>/state/set_pose</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.robot_states.RobotState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.robot_states.</span></span><span class="sig-name descname"><span class="pre">RobotState</span></span><a class="reference internal" href="_modules/scripts/robot_states.html#RobotState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.robot_states.RobotState" title="Permalink to this definition"></a></dt>
+<dd><p>Class that is composed of several methods aimed at keeping track of the robot state (position and battery level).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.robot_states.RobotState.get_pose">
+<span class="sig-name descname"><span class="pre">get_pose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/robot_states.html#RobotState.get_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.robot_states.RobotState.get_pose" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that a new-client request related to the ‘/state/get_pose’ service is received.</p>
+<p>First, the required robot position is retrieved from a variable belonging to the class. Then, a response message is filled with such position and sent to the client.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>request</strong> (<em>empty</em>) – empty service request message</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>service response message containing the robot position to be retrieved</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>response (Point)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.robot_states.RobotState.set_pose">
+<span class="sig-name descname"><span class="pre">set_pose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/robot_states.html#RobotState.set_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.robot_states.RobotState.set_pose" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that a new client request related to the ‘/state/set_pose’ service is received.</p>
+<p>The robot position to be set is stored in a variable belonging to the class and an empty response is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>request</strong> (<em>Point</em>) – service request message containing the robot position to be set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>empty service response message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>response (empty)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.planner">
+<span id="planner-module"></span><h1>Planner Module<a class="headerlink" href="#module-scripts.planner" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-planner"></span><p>Given a target location, via a client request, the node at issue retrieves the current robot position from the ‘robot-states’ node, and returns a plan as a set of via-points.</p>
+<dl class="simple">
+<dt>Client:</dt><dd><ul class="simple">
+<li><p>/state/get_pose</p></li>
+</ul>
+</dd>
+<dt>Action service:</dt><dd><ul class="simple">
+<li><p>motion/planner</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.planner.PlaningAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.planner.</span></span><span class="sig-name descname"><span class="pre">PlaningAction</span></span><a class="reference internal" href="_modules/scripts/planner.html#PlaningAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.planner.PlaningAction" title="Permalink to this definition"></a></dt>
+<dd><p>Class that is composed of several methods aimed at simulating the generation of a path towards a desired location.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.planner.PlaningAction.execute_callback">
+<span class="sig-name descname"><span class="pre">execute_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">goal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/planner.html#PlaningAction.execute_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.planner.PlaningAction.execute_callback" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that a client goal-request related to the ‘motion/planner’ action service is received.</p>
+<p>This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the ‘robot-state’ node), while the last
+point is the ‘goal’ position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range.
+To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.
+The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>goal</strong> (<em>str</em>) – goal request message containing the target location to generate the path to</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>response message containing the generated path as a list of via-points</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>result (Point list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.controller">
+<span id="controller-module"></span><h1>Controller Module<a class="headerlink" href="#module-scripts.controller" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-controller"></span><p>Given a path as a set of via-points, via a client request, the node at issue simulates the movements to reach each point with a random delay.
+Furthermore the node updates the current robot position stored in the ‘robot-states’ node every time that a via-point has supposedly been reached.</p>
+<dl class="simple">
+<dt>Client:</dt><dd><ul class="simple">
+<li><p>/state/set_pose</p></li>
+</ul>
+</dd>
+<dt>Action service:</dt><dd><ul class="simple">
+<li><p>motion/controller</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.controller.ControllingAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.controller.</span></span><span class="sig-name descname"><span class="pre">ControllingAction</span></span><a class="reference internal" href="_modules/scripts/controller.html#ControllingAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.controller.ControllingAction" title="Permalink to this definition"></a></dt>
+<dd><p>Class that is composed of several methods aimed at simulating the control of the robot along a generated path.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.controller.ControllingAction.execute_callback">
+<span class="sig-name descname"><span class="pre">execute_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">goal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/controller.html#ControllingAction.execute_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.controller.ControllingAction.execute_callback" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that a client goal-request related to the ‘motion/controller’ action service is received.</p>
+<p>This function requires a list of via points (i.e., the path), and it simulates a movement through each point with a delay spanning in a predefined range.
+As soon as each via point is reached, the related robot position is updated in the ‘robot-state’ node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>goal</strong> (<em>Point list</em>) – goal request message containing the path to follow as a list of via-points</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>response message consisting in the reached point</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>result (Point)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.state_machine">
+<span id="state-machine-module"></span><h1>State Machine Module<a class="headerlink" href="#module-scripts.state_machine" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-state_machine"></span><p>This node interacts with the other nodes of the software architecture in order to determine the desired behaviour of the robot.
+Specifically, first of all it sets the initial position of the robot, by communicating it to the ‘robot-states’ node. The proper state-machine, composed of 6 states, is then started.
+Once the node enters the firs state (‘BuildEnvironment’), a GUI is printed on the screen, asking for the environment’s characteristics. After that, the desired environment is built, by communicating with the ARMOR server.
+In other words, a series of requests is issued to the ARMOR server, which takes care of the actual creation of the ontology. The control is then passed to the second state (‘Reason’).
+This is in charge of querying the ontology about the rooms adjacent to the one the robot is in. Based on the decision taken in this state, the robot is instructed to go either in an adjacent urgent room or in an adjacent corridor.
+In order to accomplish this task, in a new state (‘Navigate’), first a request is issued to the planner server (‘planner’ node) so as to retrieve a path towards the desired destinetion.
+Then, the evaluated path is forwarded to the controller server (‘controller node’) via another request, in order to guide the robot towards the location at issue.
+Once the desired location has been reached, the state changes again (‘Wait’) and the robot ‘sleeps’ for a little time, simulating the room exploration.
+Whatever the state the robot is in, if a ‘battery_low’ message is sent on the corresponding topic by the ‘robot-states’ node, the robot is instructed to drop what it is doing and navigate to the charging room to recharge its battery.
+Specifically, first the state changes to ‘NavigatetoCharge’, whereby the same mechanism as the state ‘Navigate’ is carried out. Then, the node enters the state called ‘Charge’, that simulates the act of recharging the robot’s battery.
+After that, the control is passed again to the state ‘Reason’ and the cycle repeats.</p>
+<dl class="simple">
+<dt>Subscribes to:</dt><dd><ul class="simple">
+<li><p>/state/battery_low</p></li>
+</ul>
+</dd>
+<dt>Client:</dt><dd><ul class="simple">
+<li><p>/state/set_pose</p></li>
+<li><p>/armor_interface_srv</p></li>
+</ul>
+</dd>
+<dt>Action client:</dt><dd><ul class="simple">
+<li><p>motion/planner</p></li>
+<li><p>motion/controller</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.BuildEnvironment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">BuildEnvironment</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#BuildEnvironment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.BuildEnvironment" title="Permalink to this definition"></a></dt>
+<dd><p>Class that defines a state whereby the environment is created as the user desires.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The only possible outcome of the implemented state is the string ‘environment_built’.
+The variable ‘sm_targetloc’ shared among the states here is referred as: ‘buildenvironment_targetloc_in’ (as far as the input value is concerned) and ‘buildenvironment_targetloc_out’ (as far as the output value is concerned).
+It contains the location the robot should reach.
+The variable ‘sm_prevstate’ shared among the states here is referred as: ‘buildenvironment_prevstate_in’ (as far as the input value is concerned) and ‘buildenvironment_prevstate_out’ (as far as the output value is concerned).
+It contains the previous state identifier.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.BuildEnvironment.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#BuildEnvironment.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.BuildEnvironment.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that this state is executed.</p>
+<p>First, the GUI function is called in order to let the user decide how the environment should be and the retrieved information are stored in lists. Then, the desired environment is built, thanks to a series of requests issued to the ARMOR server, which takes care of the actual creation of the ontology.
+This task is carried out by means of the ‘build_environment’ method belonging to the imported class named ‘EnvironmentOntology’. Finally the global variable ‘transition’ is assigned with the string ‘environment_built’ and it is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>userdata</strong> (<em>struct</em>) – structure containing the input and output variables of the state</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Charge">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Charge</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Charge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Charge" title="Permalink to this definition"></a></dt>
+<dd><p>Class that defines a state that simulates the robot’s battery recharging.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘battery_full’.
+The variable ‘sm_targetloc’ shared among the states here is referred as: ‘charge_targetloc_in’ (as far as the input value is concerned) and ‘charge_targetloc_out’ (as far as the output value is concerned).
+It contains the location the robot should reach.
+The variable ‘sm_prevstate’ shared among the states here is referred as: ‘charge_prevstate_in’ (as far as the input value is concerned) and ‘charge_prevstate_out’ (as far as the output value is concerned).
+It contains the previous state identifier.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Charge.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Charge.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Charge.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that this state is executed.</p>
+<p>The function simply makes the process sleep for the desired charging time (5 s by default). However, during this period of time, the global variable ‘tansition’ is checked 10 times in order to detect possible ‘battery_low’ signals that have been issued.
+After the total amount of time, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘battery_full’.
+At the end of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
+Finally the global variable ‘transition’ is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>userdata</strong> (<em>struct</em>) – structure containing the input and output variables of the state</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Navigate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Navigate</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Navigate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Navigate" title="Permalink to this definition"></a></dt>
+<dd><p>Class that defines a state whereby a path towards the goal location is generated and the robot is guided along such path.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘target_reached’.
+The variable ‘sm_targetloc’ shared among the states here is referred as: ‘navigate_targetloc_in’ (as far as the input value is concerned) and ‘navigate_targetloc_out’ (as far as the output value is concerned).
+It contains the location the robot should reach.
+The variable ‘sm_prevstate’ shared among the states here is referred as: ‘navigate_prevstate_in’ (as far as the input value is concerned) and ‘navigate_prevstate_out’ (as far as the output value is concerned).
+It contains the previous state identifier.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Navigate.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Navigate.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Navigate.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that this state is executed.</p>
+<p>First, a request to the ‘planner’ server, containing the desired location that has been determined in the ‘Reason’ state, is sent. The server generates and returns a series of via-point towards the location at issue.
+This list is passed on in form of a request to the ‘controller’ server which guides the robot along such path. During the accomplishment of this task the global variable ‘transition’ is continuously checked.
+If, by the time the ‘controller’ server finished performing the task, the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘target_reached’.
+At the beginning of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
+At the end of the function instead, once the ‘controller’ server returned succesfully, the ‘update_robot_location’ and ‘update_robot_stamp’ methods are executed so as to update both the robot timestamp related to the last time it moved and its location.
+Finally the global variable ‘transition’ is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>userdata</strong> (<em>struct</em>) – structure containing the input and output variables of the state</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.NavigatetoCharge">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">NavigatetoCharge</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#NavigatetoCharge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.NavigatetoCharge" title="Permalink to this definition"></a></dt>
+<dd><p>Class that defines a state whereby a path towards the charging room is generated and the robot is guided along such path.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘target_reached’.
+The variable ‘sm_targetloc’ shared among the states here is referred as: ‘navigatetocharge_targetloc_in’ (as far as the input value is concerned) and ‘navigatetocharge_targetloc_out’ (as far as the output value is concerned).
+It contains the location the robot should reach.
+The variable ‘sm_prevstate’ shared among the states here is referred as: ‘navigatetocharge_prevstate_in’ (as far as the input value is concerned) and ‘navigatetocharge_prevstate_out’ (as far as the output value is concerned).
+It contains the previous state identifier.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.NavigatetoCharge.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#NavigatetoCharge.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.NavigatetoCharge.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that this state is executed.</p>
+<p>If the previous state was not ‘NavigatetoCharge’, possible control goals are cancelled and a request to the ‘planner’ server, containing the charging room, is sent. The server generates and returns a series of via-point towards the location at issue.
+This list is passed on in form of a request to the ‘controller’ server which guides the robot along such path. During the accomplishment of this task the global variable ‘transition’ is continuously checked.
+If, by the time the ‘controller’ server finished performing the task, the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘target_reached’.
+At the beginning of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
+At the end of the function instead, once the ‘controller’ server returned succesfully, the ‘update_robot_location’ and ‘update_robot_stamp’ methods are executed so as to update both the robot timestamp related to the last time it moved and its location.
+Finally the global variable ‘transition’ is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>userdata</strong> (<em>struct</em>) – structure containing the input and output variables of the state</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Reason">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Reason</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Reason"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Reason" title="Permalink to this definition"></a></dt>
+<dd><p>Class that defines a state whereby the created ontology is interrogated in order to retrieve information about the locations adjacent to the room that the robot is in.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘done_reasoning’.
+The variable ‘sm_targetloc’ shared among the states here is referred as: ‘reason_targetloc_in’ (as far as the input value is concerned) and ‘reason_targetloc_out’ (as far as the output value is concerned).
+It contains the location the robot should reach.
+The variable ‘sm_prevstate’ shared among the states here is referred as: ‘reason_prevstate_in’ (as far as the input value is concerned) and ‘reason_prevstate_out’ (as far as the output value is concerned).
+It contains the previous state identifier.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Reason.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Reason.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Reason.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that this state is executed.</p>
+<p>First, the ‘urgent_check’ method belonging to the imported class named ‘EnvironmentOntology’ is executed to find out if there is an urgent room among the adjacent ones.
+Based on this check, the method at issue returns the location that the robot should reach, which is then stored in the output variable ‘reason_targetloc_out’.
+Finally, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘done_reasoning’ and it is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>userdata</strong> (<em>struct</em>) – structure containing the input and output variables of the state</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Wait">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Wait</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Wait"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Wait" title="Permalink to this definition"></a></dt>
+<dd><p>Class that defines a state that simulates the robot exploring the reached location.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘waited_enough’.
+The variable ‘sm_targetloc’ shared among the states here is referred as: ‘wait_targetloc_in’ (as far as the input value is concerned) and ‘wait_targetloc_out’ (as far as the output value is concerned).
+It contains the location the robot should reach.
+The variable ‘sm_prevstate’ shared among the states here is referred as: ‘wait_prevstate_in’ (as far as the input value is concerned) and ‘wait_prevstate_out’ (as far as the output value is concerned).
+It contains the previous state identifier.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Wait.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Wait.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Wait.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that this state is executed.</p>
+<p>The function simply makes the process sleep for the desired ‘exploring’ time (5 s by default). However, during this period of time, the global variable ‘tansition’ is checked 10 times in order to detect possible ‘battery_low’ signals that have been issued.
+After the total amount of time, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘waited_enough’.
+At the end of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
+Finally the global variable ‘transition’ is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>userdata</strong> (<em>struct</em>) – structure containing the input and output variables of the state</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.actcli_control">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">actcli_control</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;actionlib.simple_action_client.SimpleActionClient</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#scripts.state_machine.actcli_control" title="Permalink to this definition"></a></dt>
+<dd><p>Global action client the task of which is to ask the ‘controller’ server to guide the robot towards a desired location along a given path</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.actcli_plan">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">actcli_plan</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;actionlib.simple_action_client.SimpleActionClient</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#scripts.state_machine.actcli_plan" title="Permalink to this definition"></a></dt>
+<dd><p>Global action client the task of which is to ask the ‘planner’ server to generate a path towards a desired location</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.cancel_control_goals">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">cancel_control_goals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#cancel_control_goals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.cancel_control_goals" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to send requests belonging to the ‘motion/controller’ action service.</p>
+<p>The function is simply aimed at cancelling all pending control goals.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.clbk_battery">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">clbk_battery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#clbk_battery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.clbk_battery" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called every time that a new message is published on the ‘/state/battery_low’ topic.</p>
+<p>The function is aimed at catching the messages published on the topic by the ‘robot-states’ node and changing the value of the global variable ‘transition’ so as to make the state-machine evolve into the ‘NavigatetoCharge’ state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>Bool</em>) – in priciple always set to ‘True’ to warn the state-mchine about the fact that the battery is low</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.control">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">via_points_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.control" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to send requests belonging to the ‘motion/controller’ action service.</p>
+<p>The function sends the list of via-points passed as argument in form of request to the action server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>via_points_list</strong> (<em>Point list</em>) – list containing random-generated via-points towards the goal location</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.generate_lists">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">generate_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_n_corridors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_n_rooms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#generate_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.generate_lists" title="Permalink to this definition"></a></dt>
+<dd><p>Function that given some pieces of information about the desired environment, generates a list of labels for each kind of item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tot_n_corridors</strong> (<em>int</em>) – total number of corridors in the desired environment</p></li>
+<li><p><strong>tot_n_rooms</strong> (<em>int</em>) – total number of rooms in the desired environment</p></li>
+<li><p><strong>connection</strong> (<em>Bool array</em>) – array containing information about the connection between adjacent corridors in the desired environment</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list containing the lables associated with all the doors in the environment
+rooms_list (str list): list containing the lables associated with all the rooms in the environment
+corridors_list (str list): list containing the lables associated with all the corridors in the environment</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>doors_list (str list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.gui_function">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">gui_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#gui_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.gui_function" title="Permalink to this definition"></a></dt>
+<dd><p>Function that prints on the screen a GUI to guide the user in building the desired environment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.main">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.main" title="Permalink to this definition"></a></dt>
+<dd><p>Function that first initializes and defines the subscriber to the ‘/state/battery_low’ topic, then it starts the ‘smach’ state-machine and finally spins to allow the cyclical execution of these mechanisms.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.mutex">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">mutex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;unlocked</span> <span class="pre">_thread.lock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#scripts.state_machine.mutex" title="Permalink to this definition"></a></dt>
+<dd><p>Global mutex to manage the access to the global variable ‘transition’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.plan">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.plan" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to send requests belonging to the ‘motion/planner’ action service.</p>
+<p>First, the goal location passed as argument is sent in form of request to the action server. Then, the process waits for the path towards the location to be generated.
+When the action server provides the path, it is stored in a variable and returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>location</strong> (<em>str</em>) – label of the location that the robot has to reach</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list containing random-generated via-points towards the goal location</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>via_points_list (Point list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.set_initial_pose">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">set_initial_pose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#set_initial_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.set_initial_pose" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to send requests belonging to the ‘/state/set_pose’ service.</p>
+<p>After the service is defined and initialised, the inital pose of the robot is retrieved from the parameter server. Then, this pose is sent in form of request to the server.
+The user is notified both if the service call fails and if it succeds.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.transition">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">transition</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'no_transition'</span></em><a class="headerlink" href="#scripts.state_machine.transition" title="Permalink to this definition"></a></dt>
+<dd><p>Global string variable containing the current transition</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.custom_classes">
+<span id="custom-classes-module"></span><h1>Custom Classes Module<a class="headerlink" href="#module-scripts.custom_classes" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-custom_classes"></span><p>This script implements a custom class for the creation of ontologies and for the interaction with them.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.custom_classes.</span></span><span class="sig-name descname"><span class="pre">EnvironmentOntology</span></span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology" title="Permalink to this definition"></a></dt>
+<dd><p>Class that allows for the creation of instances representing ontologies and for the interaction with the ARMOR server, which manages the corresponding ontologies.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.build_environment">
+<span class="sig-name descname"><span class="pre">build_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ontology_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_n_corridors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms_corridor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rooms_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doors_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corridors_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.build_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.build_environment" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to construct the desired ontology.</p>
+<p>First, the plain ontology (ontology without the Abox) is loaded. Then, based on the arguments that have been passed to the function, some manipulations of the ontology are performed.
+In particular for each location the doors are specified and all the defined individuals are made disjointed between each other.
+In addition to that, the robot is positioned in the charging room and the timestamp of the last time a location has been visited is initialised for each location.
+Finally, the reasoner is instructed to reason about the changes that were made and the constructed ontology (ontology with the Abox) is saved with the name passed as argument.
+Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>ontology_name</strong> (<em>str</em>) – string that specifies the name the contructed ontology is saved with</p></li>
+<li><p><strong>tot_n_corridors</strong> (<em>int</em>) – total number of corridors in the desired environment</p></li>
+<li><p><strong>rooms_corridor</strong> (<em>int array</em>) – array containing the number of rooms connected to each corridor in the desired environment</p></li>
+<li><p><strong>n_rooms_left</strong> (<em>int</em>) – number of rooms that have not been assigned to a corridor in the desired environment and therefore are connected to the charging room</p></li>
+<li><p><strong>connection</strong> (<em>Bool array</em>) – array containing information about the connection between adjacent corridors in the desired environment</p></li>
+<li><p><strong>doors_list</strong> (<em>str list</em>) – list containing the lables associated with all the doors in the environment</p></li>
+<li><p><strong>rooms_list</strong> (<em>str list</em>) – list containing the lables associated with all the rooms in the environment</p></li>
+<li><p><strong>corridors_list</strong> (<em>str list</em>) – list containing the lables associated with all the corridors in the environment</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.send_armor_request">
+<span class="sig-name descname"><span class="pre">send_armor_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_command_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secondary_command_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.send_armor_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.send_armor_request" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to send requests belonging to the ‘/armor_interface_srv’ service.</p>
+<p>The function simply fills the ‘ArmorDirectiveRequest’ message fields with the arguments that have been passed to it and sends the request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>command</strong> (<em>str</em>) – string that specifies the action that the server should perform</p></li>
+<li><p><strong>primary_command_spec</strong> (<em>str</em>) – string that encodes a specification regarding the command</p></li>
+<li><p><strong>secondary_command_spec</strong> (<em>str</em>) – string that encodes a specification regarding the command</p></li>
+<li><p><strong>args</strong> (<em>str list</em>) – list containing further arguments for the request</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>complex struct containing the server response to the request</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>res (ArmorDirectiveResponse)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.update_robot_location">
+<span class="sig-name descname"><span class="pre">update_robot_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reached_location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.update_robot_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.update_robot_location" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to update where the robot is.</p>
+<p>First, the ontology is queried in order to retrieve the location that the robot is in. Then, the just-retrieved location is replaced with the location passed as argument.
+Finally, the reasoner is instructed to reason about the changes that were made.
+Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>reached_location</strong> (<em>str</em>) – string that specifies the location reached by the robot</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.update_robot_stamp">
+<span class="sig-name descname"><span class="pre">update_robot_stamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.update_robot_stamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.update_robot_stamp" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to update the timestamp that takes into account the last time the robot moved.</p>
+<p>First, the ontology is queried in order to retrieve the timestamp of the last time the robot moved. Then, the just-retrieved timestamp is replaced with the current time.
+Finally, the reasoner is instructed to reason about the changes that were made.
+Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self</strong> – variable that refers to the class instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.update_room_stamp">
+<span class="sig-name descname"><span class="pre">update_room_stamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.update_room_stamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.update_room_stamp" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to update the timestamp that takes into account the last time a location was visited.</p>
+<p>First, the ontology is queried in order to retrieve both the location that the robot is in and the timestamp of the last time the robot visited such location.
+Then, the just-retrieved timestamp is replaced with the current time. Finally, the reasoner is instructed to reason about the changes that were made.
+Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self</strong> – variable that refers to the class instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.urgent_check">
+<span class="sig-name descname"><span class="pre">urgent_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.urgent_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.urgent_check" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is called in order to determine the location that the robot should reach next.</p>
+<p>First, the ontology is queried so as to retrieve the locations that the robot can reach. Then, the labels associated to reachable locations are checked in order to detect urgent locations and corridors.
+If no urgent location has been detected, then a corridor, randomly chosen among the reachable locations, is returned. Otherwise an urgent location, randomly chosen among the reachable locations, is returned.
+Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self</strong> – variable that refers to the class instance</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>string that specifies the location that the robot should reach next</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>inspected_location/inspected_corridor (str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.architecture_name_mapper">
+<span id="architecture-name-mapper-module"></span><h1>Architecture Name Mapper Module<a class="headerlink" href="#module-scripts.architecture_name_mapper" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-architecture_name_mapper"></span><p>This script implements a ‘dictionary’ that defines some names and a function for logging, that are used in the architecture modules.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Emanuele Rambaldi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scripts.planner &mdash; first_exprob_assignment 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> first_exprob_assignment
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">first_exprob_assignment</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>scripts.planner</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scripts.planner</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: planner</span>
+<span class="sd">    :platform: Unix</span>
+<span class="sd">    :synopsis: Python module that implements a dummy planner that simulates the generation of a path towards a desired location</span>
+
+<span class="sd">.. moduleauthor:: Emanuele Rambaldi &lt;emanuele.rambaldi3@studio.unibo.it&gt;</span>
+
+<span class="sd">Given a target location, via a client request, the node at issue retrieves the current robot position from the &#39;robot-states&#39; node, and returns a plan as a set of via-points.</span>
+
+<span class="sd">Client:</span>
+<span class="sd">    - /state/get_pose</span>
+
+<span class="sd">Action service:</span>
+<span class="sd">    - motion/planner</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="c1"># Import constant name defined to structure the architecture.</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/home/emanuelerambaldi/ROS/my_ros_ws/src/exprob_first_assignment/scripts&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">architecture_name_mapper</span> <span class="k">as</span> <span class="nn">anm</span>
+<span class="c1"># Import the ActionServer implementation used.</span>
+<span class="kn">from</span> <span class="nn">actionlib</span> <span class="kn">import</span> <span class="n">SimpleActionServer</span>
+<span class="c1"># Import custom message, actions and services.</span>
+<span class="kn">from</span> <span class="nn">exprob_first_assignment.msg</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">PlanFeedback</span><span class="p">,</span> <span class="n">PlanResult</span>
+<span class="kn">from</span> <span class="nn">exprob_first_assignment.srv</span> <span class="kn">import</span> <span class="n">GetPose</span>
+<span class="kn">import</span> <span class="nn">exprob_first_assignment</span> <span class="c1"># This is required to pass the `PlanAction` type for instantiating the `SimpleActionServer`.</span>
+
+
+<span class="c1"># A tag for identifying logs producer.</span>
+<span class="n">LOG_TAG</span> <span class="o">=</span> <span class="n">anm</span><span class="o">.</span><span class="n">NODE_PLANNER</span>
+
+
+<span class="c1"># An action server to simulate motion planning.</span>
+<span class="c1"># Given a target position, it retrieve the current robot position from the </span>
+<span class="c1"># `robot-state` node, and return a plan as a set of via points.</span>
+<div class="viewcode-block" id="PlaningAction"><a class="viewcode-back" href="../../index.html#scripts.planner.PlaningAction">[docs]</a><span class="k">class</span> <span class="nc">PlaningAction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Class that is composed of several methods aimed at simulating the generation of a path towards a desired location.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; (constructor) Function that is called whenever an instance of this class is defined.</span>
+
+<span class="sd">        First, some parameters, needed for determining the functioning of the dummy planning algorithm, are retrieved from the parameter server. </span>
+<span class="sd">        Then, the actions server that answers to requests belonging to the &#39;motion/planner&#39; action service and assigns the &#39;execute_callback&#39; function to it.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get random-based parameters used by this server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_points</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_PLANNER_POINTS</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_time</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_PLANNER_TIME</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_environment_size</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_ENVIRONMENT_SIZE</span><span class="p">)</span>
+        <span class="c1"># Instantiate and start the action server based on the `SimpleActionServer` class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_as</span> <span class="o">=</span> <span class="n">SimpleActionServer</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">ACTION_PLANNER</span><span class="p">,</span> 
+                                      <span class="n">exprob_first_assignment</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">PlanAction</span><span class="p">,</span>  
+                                      <span class="n">execute_cb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execute_callback</span><span class="p">,</span> 
+                                      <span class="n">auto_start</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_as</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="c1"># Log information.</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` Action Server initialised. It will create random path with a number of point &#39;</span> \
+                  <span class="s1">&#39;spanning in [</span><span class="si">%d</span><span class="s1">, </span><span class="si">%d</span><span class="s1">). Each point will be generated with a delay spanning in [</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">).&#39;</span> \
+                  <span class="o">%</span> <span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">ACTION_PLANNER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_points</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+      
+    <span class="c1"># The callback invoked when a client set a goal to the `planner` server.</span>
+    <span class="c1"># This function will return a list of random points (i.e., the plan) when the fist point</span>
+    <span class="c1"># is the current robot position (retrieved from the `robot-state` node), while the last </span>
+    <span class="c1"># point is the `goal` position (randomly determined since it is a dummy implementation). The plan will contain </span>
+    <span class="c1"># a random number of other points, which spans in the range </span>
+    <span class="c1"># [`self._random_plan_points[0]`, `self._random_plan_points[1]`). To simulate computation,</span>
+    <span class="c1"># each point is added to the plan with a random delay spanning in the range </span>
+    <span class="c1"># [`self._random_plan_time[0]`, `self._random_plan_time[1]`).</span>
+<div class="viewcode-block" id="PlaningAction.execute_callback"><a class="viewcode-back" href="../../index.html#scripts.planner.PlaningAction.execute_callback">[docs]</a>    <span class="k">def</span> <span class="nf">execute_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Function that is called every time that a client goal-request related to the &#39;motion/planner&#39; action service is received.</span>
+
+<span class="sd">        This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the &#39;robot-state&#39; node), while the last </span>
+<span class="sd">        point is the &#39;goal&#39; position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range. </span>
+<span class="sd">        To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.</span>
+<span class="sd">        The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner. </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            goal (str): goal request message containing the target location to generate the path to</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            result (Point list): response message containing the generated path as a list of via-points</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get the input parameters to compute the plan, i.e., the start (or current) and target positions.</span>
+        <span class="n">start_point</span> <span class="o">=</span> <span class="n">_get_pose_client</span><span class="p">()</span>
+        <span class="c1"># target_point = goal.target</span>
+        <span class="n">target_location</span> <span class="o">=</span> <span class="n">goal</span><span class="o">.</span><span class="n">location</span>
+
+        <span class="c1"># EVVALUATE A RANDOM TARGET POINT</span>
+        <span class="n">target_point</span> <span class="o">=</span> <span class="n">Point</span><span class="p">()</span>
+        <span class="n">target_point</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1">#extract randomly a float number inside the boundaries</span>
+        <span class="n">target_point</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#extract randomly a float number inside the boundaries</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[96m&#39;</span> <span class="o">+</span> <span class="s2">&quot;Start and target points&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">start_point</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">target_point</span><span class="p">)</span>
+
+        <span class="c1"># Check if the start and target positions are correct. If not, this service will be aborted.</span>
+        <span class="k">if</span> <span class="n">start_point</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">target_point</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Cannot have `None` start point nor target_point. This service will be aborted!.&#39;</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+            <span class="c1"># Close service by returning an `ABORT` state to the client.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_as</span><span class="o">.</span><span class="n">set_aborted</span><span class="p">()</span>
+            <span class="k">return</span>
+        
+        <span class="c1"># Initialise the `feedback` with the starting point of the plan.</span>
+        <span class="n">feedback</span> <span class="o">=</span> <span class="n">PlanFeedback</span><span class="p">()</span>
+        <span class="n">feedback</span><span class="o">.</span><span class="n">via_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">feedback</span><span class="o">.</span><span class="n">via_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_point</span><span class="p">)</span>
+        <span class="c1"># Publish the feedback and wait to simulate computation.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_as</span><span class="o">.</span><span class="n">publish_feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+        <span class="n">delay</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+
+        <span class="c1"># Get a random number of via points to be included in the plan.</span>
+        <span class="n">number_of_points</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;PLANNER: evaluating a path to the desired location (</span><span class="si">%s</span><span class="s1">) &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target_location</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Server is planning </span><span class="si">%i</span><span class="s1"> points...&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">number_of_points</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+
+        <span class="c1"># Generate the points of the plan.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">number_of_points</span><span class="p">):</span>
+            <span class="c1"># Check that the client did not cancel this service.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_as</span><span class="o">.</span><span class="n">is_preempt_requested</span><span class="p">():</span>
+                <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="s1">&#39;Server has been cancelled by the client!&#39;</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+                <span class="c1"># Actually cancel this service.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_as</span><span class="o">.</span><span class="n">set_preempted</span><span class="p">()</span>  
+                <span class="k">return</span>
+            <span class="c1"># Generate a new random point of the plan.</span>
+            <span class="n">new_point</span> <span class="o">=</span> <span class="n">Point</span><span class="p">()</span>
+            <span class="n">new_point</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">new_point</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">feedback</span><span class="o">.</span><span class="n">via_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_point</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">number_of_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># Publish the new random point as feedback to the client.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_as</span><span class="o">.</span><span class="n">publish_feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+                <span class="c1"># Wait to simulate computation.</span>
+                <span class="n">delay</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_plan_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Append the target point to the plan as the last point.</span>
+                <span class="n">feedback</span><span class="o">.</span><span class="n">via_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target_point</span><span class="p">)</span>
+
+        <span class="c1"># Publish the results to the client.        </span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">PlanResult</span><span class="p">()</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">via_points</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">via_points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_as</span><span class="o">.</span><span class="n">set_succeeded</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;The motion plan to the desired location (</span><span class="si">%s</span><span class="s1">) has been generated! &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target_location</span><span class="p">)</span>
+        <span class="n">log_msg</span> <span class="o">+=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;), &#39;</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">via_points</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span></div></div>
+
+
+<span class="c1"># Retrieve the current robot pose by the `state/get_pose` server of the `robot-state` node.</span>
+<span class="k">def</span> <span class="nf">_get_pose_client</span><span class="p">():</span>
+
+    <span class="sd">&quot;&quot;&quot; Function that is called whenever the action server determines a path towards a target location.</span>
+
+<span class="sd">    This function simply sends a request belonging to the &#39;/state/get_pose&#39; service to the &#39;robot-states&#39; node to retrieve the current position of the robot.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        pose (Point): current position of the robot</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Eventually, wait for the server to be initialised.</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">SERVER_GET_POSE</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Call the service and get a response with the current robot position.</span>
+        <span class="n">service</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">SERVER_GET_POSE</span><span class="p">,</span> <span class="n">GetPose</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">service</span><span class="p">()</span>
+        <span class="n">pose</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">pose</span>
+        <span class="c1"># Log service response.</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Retrieving current robot position from the `</span><span class="si">%s</span><span class="s1">` node as: (</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">).&#39;</span> \
+                  <span class="o">%</span> <span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">NODE_ROBOT_STATE</span><span class="p">,</span> <span class="n">pose</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">pose</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">pose</span>
+    <span class="k">except</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Server cannot get current robot position: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; Function that instantiates the &#39;PlanningAction()&#39; class and waits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise the node, its action server, and wait.    </span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">NODE_PLANNER</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">rospy</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="n">PlaningAction</span><span class="p">()</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Emanuele Rambaldi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

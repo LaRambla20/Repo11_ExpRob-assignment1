@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scripts.custom_classes &mdash; first_exprob_assignment 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> first_exprob_assignment
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">first_exprob_assignment</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>scripts.custom_classes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scripts.custom_classes</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: custom_classes</span>
+<span class="sd">    :platform: Unix</span>
+<span class="sd">    :synopsis: Python script that implements a custom class for the creation of ontologies and for the interaction with them.</span>
+
+<span class="sd">.. moduleauthor:: Emanuele Rambaldi &lt;emanuele.rambaldi3@studio.unibo.it&gt;</span>
+
+<span class="sd">This script implements a custom class for the creation of ontologies and for the interaction with them.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># IMPORTS</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">http.client</span> <span class="kn">import</span> <span class="n">USE_PROXY</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
+<span class="kn">import</span> <span class="nn">roslib</span>
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">import</span> <span class="nn">smach</span>
+<span class="kn">import</span> <span class="nn">smach_ros</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+
+<span class="kn">from</span> <span class="nn">std_msgs.msg</span> <span class="kn">import</span> <span class="n">String</span><span class="p">,</span> <span class="n">Float64</span><span class="p">,</span> <span class="n">Bool</span><span class="p">,</span> <span class="n">Float32</span>
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">Twist</span>
+<span class="kn">from</span> <span class="nn">exprob_first_assignment.msg</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">exprob_first_assignment.srv</span> <span class="kn">import</span> <span class="n">SetPose</span><span class="p">,</span> <span class="n">SetPoseResponse</span>
+<span class="kn">import</span> <span class="nn">exprob_first_assignment</span>  <span class="c1"># This is required to pass the `PlanAction` and `ControlAction` type for instantiating the `SimpleActionClient`.</span>
+
+<span class="kn">from</span> <span class="nn">armor_msgs.srv</span> <span class="kn">import</span> <span class="n">ArmorDirective</span><span class="p">,</span> <span class="n">ArmorDirectiveRequest</span><span class="p">,</span> <span class="n">ArmorDirectiveResponse</span>
+<span class="kn">from</span> <span class="nn">armor_msgs.srv</span> <span class="kn">import</span> <span class="n">ArmorDirectiveList</span><span class="p">,</span> <span class="n">ArmorDirectiveListRequest</span><span class="p">,</span> <span class="n">ArmorDirectiveListResponse</span>
+
+<span class="kn">import</span> <span class="nn">actionlib</span>
+<span class="kn">import</span> <span class="nn">actionlib.msg</span>
+<span class="kn">from</span> <span class="nn">exprob_first_assignment.msg</span> <span class="kn">import</span> <span class="n">PlanAction</span><span class="p">,</span> <span class="n">PlanGoal</span>
+<span class="kn">from</span> <span class="nn">exprob_first_assignment.msg</span> <span class="kn">import</span> <span class="n">ControlAction</span><span class="p">,</span> <span class="n">ControlGoal</span>
+
+<span class="c1">#----------------------------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnvironmentOntology"><a class="viewcode-back" href="../../index.html#scripts.custom_classes.EnvironmentOntology">[docs]</a><span class="k">class</span> <span class="nc">EnvironmentOntology</span><span class="p">():</span>
+
+    <span class="sd">&quot;&quot;&quot;Class that allows for the creation of instances representing ontologies and for the interaction with the ARMOR server, which manages the corresponding ontologies.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># CLASS CONSTRUCTOR (function that is run one time every time that an instance of the class is instatiated)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+
+        <span class="sd">&quot;&quot;&quot; (constructor) Function that is called whenever an instance of this class is defined.</span>
+
+<span class="sd">        The function simply defines and initializes the client that sends requests belonging to the service &#39;/armor_interface_srv&#39; of type &#39;ArmorDirective&#39;.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cli_armordirective</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="s1">&#39;/armor_interface_srv&#39;</span><span class="p">,</span><span class="n">ArmorDirective</span><span class="p">)</span> <span class="c1">#initialize and define the client that sends requests belonging to the service &#39;/armor_interface_srv&#39; of type &#39;ArmorDirective&#39;</span>
+
+    <span class="c1"># CLASS METHODS</span>
+
+<div class="viewcode-block" id="EnvironmentOntology.send_armor_request"><a class="viewcode-back" href="../../index.html#scripts.custom_classes.EnvironmentOntology.send_armor_request">[docs]</a>    <span class="k">def</span> <span class="nf">send_armor_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">primary_command_spec</span><span class="p">,</span> <span class="n">secondary_command_spec</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Function that is called in order to send requests belonging to the &#39;/armor_interface_srv&#39; service.</span>
+
+<span class="sd">        The function simply fills the &#39;ArmorDirectiveRequest&#39; message fields with the arguments that have been passed to it and sends the request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            command (str): string that specifies the action that the server should perform</span>
+<span class="sd">            primary_command_spec (str): string that encodes a specification regarding the command</span>
+<span class="sd">            secondary_command_spec (str): string that encodes a specification regarding the command</span>
+<span class="sd">            args (str list): list containing further arguments for the request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            res (ArmorDirectiveResponse): complex struct containing the server response to the request</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">armordirective_req</span> <span class="o">=</span> <span class="n">ArmorDirectiveRequest</span><span class="p">()</span>
+
+        <span class="c1"># Fill the fields of the request</span>
+        <span class="n">armordirective_req</span><span class="o">.</span><span class="n">armor_request</span><span class="o">.</span><span class="n">client_name</span> <span class="o">=</span> <span class="s1">&#39;example&#39;</span>
+        <span class="n">armordirective_req</span><span class="o">.</span><span class="n">armor_request</span><span class="o">.</span><span class="n">reference_name</span> <span class="o">=</span> <span class="s1">&#39;ontoRef&#39;</span>
+        <span class="n">armordirective_req</span><span class="o">.</span><span class="n">armor_request</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="n">armordirective_req</span><span class="o">.</span><span class="n">armor_request</span><span class="o">.</span><span class="n">primary_command_spec</span> <span class="o">=</span> <span class="n">primary_command_spec</span>
+        <span class="n">armordirective_req</span><span class="o">.</span><span class="n">armor_request</span><span class="o">.</span><span class="n">secondary_command_spec</span> <span class="o">=</span> <span class="n">secondary_command_spec</span>
+        <span class="n">armordirective_req</span><span class="o">.</span><span class="n">armor_request</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        
+        <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="s1">&#39;/armor_interface_srv&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_armordirective</span><span class="p">(</span><span class="n">armordirective_req</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Service call failed: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+    <span class="c1">#----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnvironmentOntology.build_environment"><a class="viewcode-back" href="../../index.html#scripts.custom_classes.EnvironmentOntology.build_environment">[docs]</a>    <span class="k">def</span> <span class="nf">build_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ontology_name</span><span class="p">,</span> <span class="n">tot_n_corridors</span><span class="p">,</span> <span class="n">rooms_corridor</span><span class="p">,</span> <span class="n">n_rooms_left</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">doors_list</span><span class="p">,</span> <span class="n">corridors_list</span><span class="p">,</span> <span class="n">rooms_list</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Function that is called in order to construct the desired ontology.</span>
+
+<span class="sd">        First, the plain ontology (ontology without the Abox) is loaded. Then, based on the arguments that have been passed to the function, some manipulations of the ontology are performed.</span>
+<span class="sd">        In particular for each location the doors are specified and all the defined individuals are made disjointed between each other.</span>
+<span class="sd">        In addition to that, the robot is positioned in the charging room and the timestamp of the last time a location has been visited is initialised for each location.</span>
+<span class="sd">        Finally, the reasoner is instructed to reason about the changes that were made and the constructed ontology (ontology with the Abox) is saved with the name passed as argument.</span>
+<span class="sd">        Note that all these actions are performed by interacting with the ontology via the ARMOR server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            ontology_name (str): string that specifies the name the contructed ontology is saved with</span>
+<span class="sd">            tot_n_corridors (int): total number of corridors in the desired environment</span>
+<span class="sd">            rooms_corridor (int array): array containing the number of rooms connected to each corridor in the desired environment</span>
+<span class="sd">            n_rooms_left (int): number of rooms that have not been assigned to a corridor in the desired environment and therefore are connected to the charging room </span>
+<span class="sd">            connection (Bool array): array containing information about the connection between adjacent corridors in the desired environment</span>
+<span class="sd">            doors_list (str list): list containing the lables associated with all the doors in the environment</span>
+<span class="sd">            rooms_list (str list): list containing the lables associated with all the rooms in the environment</span>
+<span class="sd">            corridors_list (str list): list containing the lables associated with all the corridors in the environment</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># LOAD THE ONTOLOGY</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;LOAD&#39;</span><span class="p">,</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="s1">&#39;/home/emanuelerambaldi/topological_map_protege/topological_map.owl&#39;</span><span class="p">,</span> <span class="s1">&#39;http://bnc/exp-rob-lab/2022-23&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;PELLET&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">])</span>
+
+        <span class="n">door_to_be_used</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># QUERY ROOMS FOR EACH CORRIDOR (if any)</span>
+        <span class="k">if</span> <span class="n">tot_n_corridors</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Connecting rooms to corridors (if any):&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tot_n_corridors</span><span class="p">):</span> <span class="c1"># consider one of the corridors out of the list</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">door_to_be_used</span><span class="p">,</span><span class="n">door_to_be_used</span><span class="o">+</span><span class="n">rooms_corridor</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span> <span class="c1"># add a connection to all the rooms</span>
+                    <span class="c1">#---</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;&quot;</span> <span class="o">+</span> <span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">doors_list</span><span class="p">[</span><span class="n">j</span><span class="p">]])</span>
+                    <span class="c1">#---</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;&quot;</span> <span class="o">+</span> <span class="n">rooms_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="n">rooms_list</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">doors_list</span><span class="p">[</span><span class="n">j</span><span class="p">]])</span>
+                    <span class="c1">#---</span>
+                <span class="n">door_to_be_used</span> <span class="o">=</span> <span class="n">door_to_be_used</span> <span class="o">+</span> <span class="n">rooms_corridor</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># QUERY ROOMS FOR THE CHARGING ROOM</span>
+        <span class="k">if</span> <span class="n">n_rooms_left</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Connecting rooms to the charging room:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n_rooms_left</span><span class="p">):</span> <span class="c1">#consider the remaining rooms</span>
+                <span class="c1">#---</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;&quot;</span> <span class="o">+</span> <span class="n">rooms_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span> <span class="c1"># add the connection to the charging room</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="n">rooms_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">],</span><span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]])</span>
+                <span class="c1">#---</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;E0;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="s1">&#39;E0&#39;</span><span class="p">,</span><span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]])</span>
+                <span class="c1">#---</span>
+                <span class="n">door_to_be_used</span> <span class="o">=</span> <span class="n">door_to_be_used</span> <span class="o">+</span> <span class="mi">1</span>
+        
+        <span class="c1"># QUERY CORRIDORS (if any) FOR THE CHARGING ROOM</span>
+        <span class="k">if</span> <span class="n">tot_n_corridors</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Connecting corridors (if any) to the charging room:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tot_n_corridors</span><span class="p">):</span> <span class="c1">#consider one of the corridors out of the list</span>
+                <span class="c1">#---</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;&quot;</span> <span class="o">+</span> <span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span> <span class="c1"># add the connection to the charging room</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]])</span>
+                <span class="c1">#---</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;E0;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="s1">&#39;E0&#39;</span><span class="p">,</span><span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]])</span>
+                <span class="c1">#---</span>
+                <span class="n">door_to_be_used</span> <span class="o">=</span> <span class="n">door_to_be_used</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># QUERY CORRIDORS (if more than 1) FOR OTHER CORRIDORS (if more than 1)</span>
+        <span class="k">if</span> <span class="n">tot_n_corridors</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Connnecting corridors (if more than 1) to other corridors (if more than 1)&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">connection</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span> <span class="c1"># add the connections between corridors</span>
+                    <span class="c1">#---</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;&quot;</span> <span class="o">+</span> <span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]])</span>
+                    <span class="c1">#---</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;query (hasDoor;&quot;</span> <span class="o">+</span> <span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="o">+</span> <span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;hasDoor&#39;</span><span class="p">,</span><span class="n">corridors_list</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">doors_list</span><span class="p">[</span><span class="n">door_to_be_used</span><span class="p">]])</span>
+                    <span class="c1">#---</span>
+                    <span class="n">door_to_be_used</span> <span class="o">=</span> <span class="n">door_to_be_used</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Finished adding locations and doors... Making them disjointed...&quot;</span><span class="p">)</span>
+        <span class="c1"># print(&quot;door to be used next {0}&quot;.format(door_to_be_used)) # DEBUG</span>
+
+        <span class="nb">print</span><span class="p">([</span><span class="s1">&#39;E0&#39;</span><span class="p">,</span><span class="o">*</span><span class="n">doors_list</span><span class="p">,</span><span class="o">*</span><span class="n">corridors_list</span><span class="p">,</span><span class="o">*</span><span class="n">rooms_list</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;DISJOINT&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="s1">&#39;E0&#39;</span><span class="p">,</span><span class="o">*</span><span class="n">doors_list</span><span class="p">,</span><span class="o">*</span><span class="n">corridors_list</span><span class="p">,</span><span class="o">*</span><span class="n">rooms_list</span><span class="p">])</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Positioning the robot in the charging room...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;isIn&#39;</span><span class="p">,</span> <span class="s1">&#39;Robot1&#39;</span><span class="p">,</span> <span class="s1">&#39;E0&#39;</span><span class="p">])</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Initialising the timestamp associated to the visitedAt property of all the locations...&quot;</span><span class="p">)</span>
+
+        <span class="n">initial_visited_stamp</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span> <span class="c1"># string containing the seconds elapsed since 1960 without decimals</span>
+
+        <span class="k">for</span> <span class="n">location</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;E0&#39;</span><span class="p">,</span><span class="o">*</span><span class="n">corridors_list</span><span class="p">,</span><span class="o">*</span><span class="n">rooms_list</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;ADD&#39;</span><span class="p">,</span><span class="s1">&#39;DATAPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;visitedAt&#39;</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="s1">&#39;Long&#39;</span><span class="p">,</span> <span class="n">initial_visited_stamp</span><span class="p">])</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Reasoning...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;REASON&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="s1">&#39;&#39;</span><span class="p">])</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Saving the ontology...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;SAVE&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="s1">&#39;/home/emanuelerambaldi/topological_map_protege/&#39;</span><span class="o">+</span> <span class="n">ontology_name</span> <span class="o">+</span> <span class="s1">&#39;.owl&#39;</span><span class="p">])</span></div>
+
+    <span class="c1">#----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnvironmentOntology.urgent_check"><a class="viewcode-back" href="../../index.html#scripts.custom_classes.EnvironmentOntology.urgent_check">[docs]</a>    <span class="k">def</span> <span class="nf">urgent_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Function that is called in order to determine the location that the robot should reach next.</span>
+
+<span class="sd">        First, the ontology is queried so as to retrieve the locations that the robot can reach. Then, the labels associated to reachable locations are checked in order to detect urgent locations and corridors. </span>
+<span class="sd">        If no urgent location has been detected, then a corridor, randomly chosen among the reachable locations, is returned. Otherwise an urgent location, randomly chosen among the reachable locations, is returned.</span>
+<span class="sd">        Note that all these actions are performed by interacting with the ontology via the ARMOR server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            inspected_location/inspected_corridor (str): string that specifies the location that the robot should reach next</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[92m&#39;</span> <span class="o">+</span> <span class="s2">&quot;Checking whether there are URGENT adjacent locations or not...&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Evaluating the locations that the robot can reach...&quot;</span><span class="p">)</span>
+
+        <span class="n">res1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;QUERY&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;canReach&#39;</span><span class="p">,</span> <span class="s1">&#39;Robot1&#39;</span><span class="p">])</span>
+
+        <span class="n">adjacent_locations_list</span> <span class="o">=</span> <span class="n">res1</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">adjacent_locations_list</span><span class="p">)</span> <span class="c1"># shuffle the list of adjacent locations so as to avoid to select always the same urgent location/corridor</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacent_locations_list</span><span class="p">)):</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="n">adjacent_locations_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">32</span><span class="p">:</span><span class="mi">34</span><span class="p">])</span>
+
+        <span class="n">inspected_location</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Checking the urgency of the locations that the robot can reach...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacent_locations_list</span><span class="p">)):</span>
+            <span class="n">inspected_location</span> <span class="o">=</span> <span class="n">adjacent_locations_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">32</span><span class="p">:</span><span class="mi">34</span><span class="p">]</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Checking location &quot;</span> <span class="o">+</span> <span class="n">inspected_location</span> <span class="o">+</span> <span class="s2">&quot; urgency...&quot;</span><span class="p">)</span>
+
+            <span class="n">res2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;QUERY&#39;</span><span class="p">,</span><span class="s1">&#39;CLASS&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="n">inspected_location</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">res2</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)):</span>
+                <span class="n">inspected_class</span> <span class="o">=</span> <span class="n">res2</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># consider the part of the string after the &#39;#&#39; symbol, without the last term</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">inspected_class</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">inspected_class</span> <span class="o">==</span> <span class="s1">&#39;CORRIDOR&#39;</span><span class="p">):</span>
+                    <span class="n">inspected_corridor</span> <span class="o">=</span> <span class="n">inspected_location</span> <span class="c1"># keep track of the last corridor you inspected</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">inspected_class</span> <span class="o">==</span> <span class="s1">&#39;URGENT&#39;</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;URGENT location detected -&gt; setting &quot;</span> <span class="o">+</span> <span class="n">inspected_location</span> <span class="o">+</span> <span class="s2">&quot; as target&quot;</span><span class="p">)</span>
+                    <span class="k">return</span><span class="p">(</span><span class="n">inspected_location</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[91m&#39;</span> <span class="o">+</span><span class="s2">&quot;NO &quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span> <span class="o">+</span> <span class="s2">&quot;URGENT location  detected -&gt; setting &quot;</span> <span class="o">+</span> <span class="n">inspected_location</span> <span class="o">+</span> <span class="s2">&quot; as target&quot;</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">inspected_corridor</span><span class="p">)</span> <span class="c1"># if I exited both for loops it means that I didn&#39;t find any urgent room</span></div>
+
+    <span class="c1">#----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnvironmentOntology.update_room_stamp"><a class="viewcode-back" href="../../index.html#scripts.custom_classes.EnvironmentOntology.update_room_stamp">[docs]</a>    <span class="k">def</span> <span class="nf">update_room_stamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Function that is called in order to update the timestamp that takes into account the last time a location was visited.</span>
+
+<span class="sd">        First, the ontology is queried in order to retrieve both the location that the robot is in and the timestamp of the last time the robot visited such location. </span>
+<span class="sd">        Then, the just-retrieved timestamp is replaced with the current time. Finally, the reasoner is instructed to reason about the changes that were made.</span>
+<span class="sd">        Note that all these actions are performed by interacting with the ontology via the ARMOR server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+    
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Retrieving the current robot position...&quot;</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;QUERY&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;isIn&#39;</span><span class="p">,</span> <span class="s1">&#39;Robot1&#39;</span><span class="p">])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">32</span><span class="p">:</span><span class="mi">34</span><span class="p">])</span> <span class="c1">#from the string extract the second to last and third to last term</span>
+
+        <span class="n">current_location</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">32</span><span class="p">:</span><span class="mi">34</span><span class="p">]</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Retrieving the timestamp of the last time the robot visited location &quot;</span> <span class="o">+</span> <span class="n">current_location</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;QUERY&#39;</span><span class="p">,</span><span class="s1">&#39;DATAPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;visitedAt&#39;</span><span class="p">,</span> <span class="n">current_location</span><span class="p">])</span>
+
+        <span class="n">old_visited_stamp</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">new_visited_stamp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Before: &quot;</span><span class="o">+</span><span class="n">old_visited_stamp</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Now: &quot;</span><span class="o">+</span><span class="n">new_visited_stamp</span><span class="p">)</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Updating the timestamp of the last time the robot visited location &quot;</span> <span class="o">+</span> <span class="n">current_location</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;REPLACE&#39;</span><span class="p">,</span><span class="s1">&#39;DATAPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;visitedAt&#39;</span><span class="p">,</span> <span class="n">current_location</span><span class="p">,</span> <span class="s1">&#39;Long&#39;</span><span class="p">,</span> <span class="n">new_visited_stamp</span><span class="p">,</span> <span class="n">old_visited_stamp</span><span class="p">])</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Reasoning...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;REASON&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="s1">&#39;&#39;</span><span class="p">])</span></div>
+
+    <span class="c1">#----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnvironmentOntology.update_robot_stamp"><a class="viewcode-back" href="../../index.html#scripts.custom_classes.EnvironmentOntology.update_robot_stamp">[docs]</a>    <span class="k">def</span> <span class="nf">update_robot_stamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Function that is called in order to update the timestamp that takes into account the last time the robot moved.</span>
+
+<span class="sd">        First, the ontology is queried in order to retrieve the timestamp of the last time the robot moved. Then, the just-retrieved timestamp is replaced with the current time. </span>
+<span class="sd">        Finally, the reasoner is instructed to reason about the changes that were made.</span>
+<span class="sd">        Note that all these actions are performed by interacting with the ontology via the ARMOR server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[92m&#39;</span> <span class="o">+</span> <span class="s2">&quot;Updating the now timestamp of the robot to the instant the robot reached the location...&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Retrieving the timestamp of the last time the robot moved...&quot;</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;QUERY&#39;</span><span class="p">,</span><span class="s1">&#39;DATAPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;now&#39;</span><span class="p">,</span> <span class="s1">&#39;Robot1&#39;</span><span class="p">])</span>
+
+        <span class="n">old_now_stamp</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">new_now_stamp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Before: &quot;</span><span class="o">+</span><span class="n">old_now_stamp</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Now: &quot;</span><span class="o">+</span><span class="n">new_now_stamp</span><span class="p">)</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Updating the timestamp of the last time the robot moved...&quot;</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;REPLACE&#39;</span><span class="p">,</span><span class="s1">&#39;DATAPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;now&#39;</span><span class="p">,</span> <span class="s1">&#39;Robot1&#39;</span><span class="p">,</span> <span class="s1">&#39;Long&#39;</span><span class="p">,</span> <span class="n">new_now_stamp</span><span class="p">,</span> <span class="n">old_now_stamp</span><span class="p">])</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Reasoning...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;REASON&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="s1">&#39;&#39;</span><span class="p">])</span></div>
+
+    <span class="c1">#----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnvironmentOntology.update_robot_location"><a class="viewcode-back" href="../../index.html#scripts.custom_classes.EnvironmentOntology.update_robot_location">[docs]</a>    <span class="k">def</span> <span class="nf">update_robot_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reached_location</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Function that is called in order to update where the robot is.</span>
+
+<span class="sd">        First, the ontology is queried in order to retrieve the location that the robot is in. Then, the just-retrieved location is replaced with the location passed as argument. </span>
+<span class="sd">        Finally, the reasoner is instructed to reason about the changes that were made.</span>
+<span class="sd">        Note that all these actions are performed by interacting with the ontology via the ARMOR server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: variable that refers to the class instance</span>
+<span class="sd">            reached_location (str): string that specifies the location reached by the robot</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[92m&#39;</span> <span class="o">+</span> <span class="s2">&quot;Updating the robot location...&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Retrieving the past robot location...&quot;</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;QUERY&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;isIn&#39;</span><span class="p">,</span> <span class="s1">&#39;Robot1&#39;</span><span class="p">])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">32</span><span class="p">:</span><span class="mi">34</span><span class="p">])</span> <span class="c1">#from the string extract the second to last and third to last term</span>
+
+        <span class="n">starting_location</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">32</span><span class="p">:</span><span class="mi">34</span><span class="p">]</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Updating the robot location from &quot;</span> <span class="o">+</span> <span class="n">starting_location</span> <span class="o">+</span> <span class="s2">&quot; to &quot;</span><span class="o">+</span> <span class="n">reached_location</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;REPLACE&#39;</span><span class="p">,</span><span class="s1">&#39;OBJECTPROP&#39;</span><span class="p">,</span><span class="s1">&#39;IND&#39;</span><span class="p">,[</span><span class="s1">&#39;isIn&#39;</span><span class="p">,</span> <span class="s1">&#39;Robot1&#39;</span><span class="p">,</span>  <span class="n">reached_location</span><span class="p">,</span> <span class="n">starting_location</span><span class="p">])</span>
+
+        <span class="c1">#---</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Reasoning...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_armor_request</span><span class="p">(</span><span class="s1">&#39;REASON&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="s1">&#39;&#39;</span><span class="p">])</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Emanuele Rambaldi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
