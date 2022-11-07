@@ -10,7 +10,7 @@ The ROS package contains a launch file (`software_architecture.launch`) that lau
 * `robot_states`: node that keeps track of the robot state (position and battery level). SPecifically, it defines two services to get and set the current robot pose, and a publisher to notify that the battery is low.
 * `planner`: node that, given a desired location, retrieves the current robot position from the 'robot-states' node and returns a random plan as a set of via-points. In other words, it simulates the generation of a path towards a desired location.
 * `controller`: node that, given a path as a set of via-points, simulates the movements to reach each via-point with a random delay. In addition to that, the node updates the current robot position stored in the 'robot-states' node every time that a via-point has supposedly been reached.
-* `state_machine`: node that interacts with the other nodes of the software architecture in order to determine the desired behaviour of the robot. In order to do that, it implements a state machine composed of 6 states: BuildEnvironment, Reason, Charge, Navigate, NavigatetoCharge, Wait.
+* `state_machine`: node that interacts with the other nodes of the software architecture in order to determine the desired behaviour of the robot. To this end, it implements a state machine composed of 6 states: BuildEnvironment, Reason, Charge, Navigate, NavigatetoCharge, Wait.
 ## How to run
 Before running the notebook it is necessary to have both the simulation and the two external nodes up and running. To this end, follow the steps hereafter mentioned:
 * open a terminal window and navigate to the `src` folder of your ROS workspace
