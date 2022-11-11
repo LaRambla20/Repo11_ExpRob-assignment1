@@ -1008,6 +1008,9 @@ class Wait(smach.State,EnvironmentOntology):
             mutex.release()
 
         # --------------------
+
+        if(userdata.wait_prevstate_in != 5): # if the previous state was not this one ('Wait')
+            self.loop_count = 0 # restart the loop counter
         
         # Wait some time (5 seconds by default) if the transition global variable remains 'no_transition'
         # This procedure of waiting is implemented to be NOT atomic, since hypothetically the robot doesn't just wait, but explores the room, so it can
