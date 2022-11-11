@@ -15,6 +15,7 @@
     <rosparam param="state_machine/explore_time"> 5.0 </rosparam>
     <rosparam param="state_machine/charge_time"> 5.0 </rosparam>
     
+    <arg name="ontology_path" default="/home/emanuelerambaldi/topological_map_protege/" />
     <arg name="ontology_name" default="test_ontology" />
     
 
@@ -42,7 +43,7 @@
           name = "state_machine"
           launch-prefix = "x-terminal-emulator -e"
           output = "screen"
-          args = "$(arg ontology_name)"
+          args = "$(arg ontology_path) $(arg ontology_name)"
     > </node>
     
 </launch>

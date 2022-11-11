@@ -106,7 +106,7 @@ class EnvironmentOntology():
 
     #----------------------------------------------------------------------------
 
-    def build_environment(self, ontology_name, tot_n_corridors, rooms_corridor, n_rooms_left, connection, doors_list, corridors_list, rooms_list):
+    def build_environment(self, ontology_path, ontology_name, tot_n_corridors, rooms_corridor, n_rooms_left, connection, doors_list, corridors_list, rooms_list):
 
         """Function that is called in order to construct the desired ontology.
 
@@ -118,6 +118,7 @@ class EnvironmentOntology():
 
         Args:
             self: variable that refers to the class instance
+            ontology_path (str): string that specifies the path to the folder that contains the ontologies
             ontology_name (str): string that specifies the name the contructed ontology is saved with
             tot_n_corridors (int): total number of corridors in the desired environment
             rooms_corridor (int array): array containing the number of rooms connected to each corridor in the desired environment
@@ -130,7 +131,7 @@ class EnvironmentOntology():
         """
 
         # LOAD THE ONTOLOGY
-        self.send_armor_request('LOAD','FILE','',['/home/emanuelerambaldi/topological_map_protege/topological_map.owl', 'http://bnc/exp-rob-lab/2022-23', 'true', 'PELLET', 'false'])
+        self.send_armor_request('LOAD','FILE','',[ontology_path + 'topological_map.owl', 'http://bnc/exp-rob-lab/2022-23', 'true', 'PELLET', 'false'])
 
         door_to_be_used = 0
 
@@ -216,7 +217,7 @@ class EnvironmentOntology():
         #---
         print("- Saving the ontology...")
 
-        self.send_armor_request('SAVE','','',['/home/emanuelerambaldi/topological_map_protege/'+ ontology_name + '.owl'])
+        self.send_armor_request('SAVE','','',[ontology_path + ontology_name + '.owl'])
 
     #----------------------------------------------------------------------------
 

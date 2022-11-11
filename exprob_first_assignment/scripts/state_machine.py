@@ -5,7 +5,7 @@
 # - run the ARMOR server
 #          $ rosrun armor execute it.emarolab.armor.ARMORMainService
 # - run the 'roscore' and then you can launch the SW architecture
-#          $ roslaunch exprob_first_assignment software_architecture.launch ontology_name:="pippo"
+#          $ roslaunch exprob_first_assignment software_architecture.launch ontology_path:="path-to-the-topological-map-folder" ontology_name:="name-of-the-constructed-ontology"
 
 """
 .. module:: state_machine
@@ -77,8 +77,7 @@ from exprob_first_assignment.msg import ControlAction, ControlGoal
 # GLOBAL VARIABLES
 
 # global action clients
-actcli_plan = actionlib.SimpleActionClient('motion/planner', PlanAction) 
-#initialize and define the global action client that sends requests belonging to the 'motion/planner' action
+actcli_plan = actionlib.SimpleActionClient('motion/planner', PlanAction) #initialize and define the global action client that sends requests belonging to the 'motion/planner' action
 """
 Global action client the task of which is to ask the 'planner' server to generate a path towards a desired location
 """
@@ -468,7 +467,8 @@ class BuildEnvironment(smach.State,EnvironmentOntology):
             print('\033[91m' + "\ntoo many or not enough arguments provided" + '\033[0m' + " -> exiting")
             sys.exit(1)
 
-        ontology_name = args[1]
+        ontology_path = args[1]
+        ontology_name = args[2]
 
         # execute the GUI function
         tot_n_rooms, tot_n_corridors, rooms_corridor, n_rooms_left, connection = gui_function()
@@ -484,7 +484,7 @@ class BuildEnvironment(smach.State,EnvironmentOntology):
         print("")
         print('\033[92m' + "Building the desired environment..." + '\033[0m')
 
-        self.build_environment(ontology_name, tot_n_corridors, rooms_corridor, n_rooms_left, connection, doors_list, corridors_list, rooms_list)
+        self.build_environment(ontology_path, ontology_name, tot_n_corridors, rooms_corridor, n_rooms_left, connection, doors_list, corridors_list, rooms_list)
 
         mutex.acquire()
         try:
