@@ -65,7 +65,7 @@ class RobotState:
         # Initialise randomness, if enabled.
         self._randomness = rospy.get_param(anm.PARAM_RANDOM_ACTIVE, True)
         if self._randomness:
-            self._random_battery_time = rospy.get_param(anm.PARAM_BATTERY_TIME, [15.0, 40.0])
+            self._random_battery_time = rospy.get_param(anm.PARAM_BATTERY_TIME, [40.0, 90.0])
             log_msg = 'Random-based battery low notification active: the battery gets low with a ' \
                       'delay in the range of [%f, %f) seconds.' % (self._random_battery_time[0], self._random_battery_time[1])
             rospy.loginfo(anm.tag_log(log_msg, LOG_TAG))
@@ -185,7 +185,7 @@ class RobotState:
             # Publish battery level (low).
             publisher.publish(Bool(self._battery_low))
             # Log state.
-            log_msg = 'Robot got low battery after %f seconds.' % delay
+            log_msg = '\033[91m' + 'Robot got low battery after %f seconds.' % delay + '\033[0m'
             self._print_info(log_msg)
 
 

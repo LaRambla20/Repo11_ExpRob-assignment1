@@ -851,11 +851,12 @@ class NavigatetoCharge(smach.State,EnvironmentOntology):
 
         """Function that is called every time that this state is executed.
 
-        If the previous state was not 'NavigatetoCharge', possible control goals are cancelled and a request to the 'planner' server, containing the charging room, is sent. The server generates and returns a series of via-point towards the location at issue. 
-        This list is passed on in form of a request to the 'controller' server which guides the robot along such path. During the accomplishment of this task the global variable 'transition' is continuously checked.
-        If, by the time the 'controller' server finished performing the task, the value of the global variable 'transition' has not changed into 'battery low', it is assigned with the string 'target_reached'.
+        If the previous state was not 'NavigatetoCharge', possible control goals are cancelled. Then, if the robot is not already in the charging room, a request to the 'planner' server, containing the charging room, is sent. 
+        The server generates and returns a series of via-points towards the location at issue. This list is passed on in form of a request to the 'controller' server which guides the robot along such path. 
+        During the accomplishment of this task the global variable 'transition' is continuously checked. If, by the time the 'controller' server finished performing the task, the value of the global variable 'transition' has not changed into 'battery low', it is assigned with the string 'target_reached'.
+        If it is the case that the robot is already in the charging room, the planning and controlling are not performed and simply the global variable is updated to 'target_reached'.
         At the beginning of the fuction, the 'update_room_stamp' method belonging to the imported class named 'EnvironmentOntology' is executed so as to update the timestamp that takes into account the last time a location was visited.
-        At the end of the function instead, once the 'controller' server returned succesfully, the 'update_robot_location' and 'update_robot_stamp' methods are executed so as to update both the robot timestamp related to the last time it moved and its location.
+        At the end of the function instead, either once the 'controller' server returned succesfully or once the process detects that the robot is already in the charging room, the 'update_robot_location' and 'update_robot_stamp' methods are executed so as to update both the robot timestamp related to the last time it moved and its location.
         Finally the global variable 'transition' is returned.
 
         Args:
@@ -892,20 +893,35 @@ class NavigatetoCharge(smach.State,EnvironmentOntology):
             # Update the visitedAt property of the location that the robot is leaving
             print("")
             print('\033[92m' + "Updating the visitedAt timestamp of the location to the instant the robot starts leaving it..." + '\033[0m')
-            self.update_room_stamp()
+            current_location = self.update_room_stamp()
 
             # --------------------
 
-            # Make a request to the planning server
-            via_points_list = plan('E0') # this function is atomic: can't be interrupted by a battery_low signal
+            if(current_location != 'E0'):
 
-            print("The path to location E0 has been generated...")
-            print(via_points_list)
+                # Make a request to the planning server
+                via_points_list = plan('E0') # this function is atomic: can't be interrupted by a battery_low signal
 
-            # --------------------
+                print("The path to location E0 has been generated...")
+                print(via_points_list)
 
-            # Make a request to the controlling server
-            control(via_points_list)
+                # --------------------
+
+                # Make a request to the controlling server
+                control(via_points_list)
+
+            else:
+                print("Already in location E0")
+
+                # Update the now property of the robot (timestamp of the last time that the robot moved)
+                self.update_robot_stamp()
+
+                mutex.acquire()
+                try:
+                    # print('\033[93m' + "\nstate NavigatetoCharge got the mutex (2)" + '\033[0m') # DEBUG
+                    transition = 'target_reached'
+                finally:
+                    mutex.release()
 
         # Wait for the end of the controlling task unless a new transition arrives
         mutex.acquire()
@@ -923,7 +939,7 @@ class NavigatetoCharge(smach.State,EnvironmentOntology):
 
                 mutex.acquire()
                 try:
-                    # print('\033[93m' + "\nstate NavigatetoCharge got the mutex (2)" + '\033[0m') # DEBUG
+                    # print('\033[93m' + "\nstate NavigatetoCharge got the mutex (3)" + '\033[0m') # DEBUG
                     transition = 'target_reached'
                 finally:
                     mutex.release()

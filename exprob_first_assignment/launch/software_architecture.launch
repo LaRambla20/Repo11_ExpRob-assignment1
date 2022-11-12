@@ -10,7 +10,8 @@
     <rosparam param="test/random_plan_points"> [2, 8] </rosparam>
     <rosparam param="test/random_plan_time"> [0.1, 1.0] </rosparam>
 
-    <rosparam param="test/random_sense/active"> False </rosparam>
+    <rosparam param="test/random_sense/active"> True </rosparam>
+    <rosparam param="test/random_sense/battery_time"> [40.0, 90.0] </rosparam>
     
     <rosparam param="state_machine/explore_time"> 5.0 </rosparam>
     <rosparam param="state_machine/charge_time"> 5.0 </rosparam>

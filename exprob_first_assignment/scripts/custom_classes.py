@@ -282,9 +282,13 @@ class EnvironmentOntology():
         First, the ontology is queried in order to retrieve both the location that the robot is in and the timestamp of the last time the robot visited such location. 
         Then, the just-retrieved timestamp is replaced with the current time. Finally, the reasoner is instructed to reason about the changes that were made.
         Note that all these actions are performed by interacting with the ontology via the ARMOR server.
+        The function returns the current robot location that it retrieved from the ontology.
 
         Args:
             self: variable that refers to the class instance
+
+        Returns:
+            current_location (str): string that specifies the current robot location
 
         """
     
@@ -315,6 +319,8 @@ class EnvironmentOntology():
         print("- Reasoning...")
 
         self.send_armor_request('REASON','','',[''])
+
+        return(current_location)
 
     #----------------------------------------------------------------------------
 
