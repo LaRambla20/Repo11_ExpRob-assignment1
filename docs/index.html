@@ -168,10 +168,12 @@
 <dt class="sig sig-object py" id="scripts.planner.PlaningAction.execute_callback">
 <span class="sig-name descname"><span class="pre">execute_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">goal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/planner.html#PlaningAction.execute_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.planner.PlaningAction.execute_callback" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that a client goal-request related to the ‘motion/planner’ action service is received.</p>
-<p>This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the ‘robot-state’ node), while the last
-point is the ‘goal’ position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range.
-To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.
-The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner.</p>
+<div class="line-block">
+<div class="line">This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the ‘robot-state’ node), while the last</div>
+<div class="line">point is the ‘goal’ position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range.</div>
+<div class="line">To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.</div>
+<div class="line">The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -193,8 +195,10 @@ The request message contains the name of the supposed target location, which her
 </div>
 <div class="section" id="module-scripts.controller">
 <span id="controller-module"></span><h1>Controller Module<a class="headerlink" href="#module-scripts.controller" title="Permalink to this headline"></a></h1>
-<span class="target" id="module-controller"></span><p>Given a path as a set of via-points, via a client request, the node at issue simulates the movements to reach each point with a random delay.
-Furthermore the node updates the current robot position stored in the ‘robot-states’ node every time that a via-point has supposedly been reached.</p>
+<span class="target" id="module-controller"></span><div class="line-block">
+<div class="line">Given a path as a set of via-points, via a client request, the node at issue simulates the movements to reach each point with a random delay.</div>
+<div class="line">Furthermore the node updates the current robot position stored in the ‘robot-states’ node every time that a via-point has supposedly been reached.</div>
+</div>
 <dl class="simple">
 <dt>Client:</dt><dd><ul class="simple">
 <li><p>/state/set_pose</p></li>
@@ -213,8 +217,10 @@ Furthermore the node updates the current robot position stored in the ‘robot-s
 <dt class="sig sig-object py" id="scripts.controller.ControllingAction.execute_callback">
 <span class="sig-name descname"><span class="pre">execute_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">goal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/controller.html#ControllingAction.execute_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.controller.ControllingAction.execute_callback" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that a client goal-request related to the ‘motion/controller’ action service is received.</p>
-<p>This function requires a list of via points (i.e., the path), and it simulates a movement through each point with a delay spanning in a predefined range.
-As soon as each via point is reached, the related robot position is updated in the ‘robot-state’ node.</p>
+<div class="line-block">
+<div class="line">This function requires a list of via points (i.e., the path), and it simulates a movement through each point with a delay spanning in a predefined range.</div>
+<div class="line">As soon as each via point is reached, the related robot position is updated in the ‘robot-state’ node.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -236,17 +242,19 @@ As soon as each via point is reached, the related robot position is updated in t
 </div>
 <div class="section" id="module-scripts.state_machine">
 <span id="state-machine-module"></span><h1>State Machine Module<a class="headerlink" href="#module-scripts.state_machine" title="Permalink to this headline"></a></h1>
-<span class="target" id="module-state_machine"></span><p>This node interacts with the other nodes of the software architecture in order to determine the desired behaviour of the robot.
-Specifically, first of all it sets the initial position of the robot, by communicating it to the ‘robot-states’ node. The proper state-machine, composed of 6 states, is then started.
-Once the node enters the firs state (‘BuildEnvironment’), a GUI is printed on the screen, asking for the environment’s characteristics. After that, the desired environment is built, by communicating with the ARMOR server.
-In other words, a series of requests is issued to the ARMOR server, which takes care of the actual creation of the ontology. The control is then passed to the second state (‘Reason’).
-This is in charge of querying the ontology about the rooms adjacent to the one the robot is in. Based on the decision taken in this state, the robot is instructed to go either in an adjacent urgent room or in an adjacent corridor.
-In order to accomplish this task, in a new state (‘Navigate’), first a request is issued to the planner server (‘planner’ node) so as to retrieve a path towards the desired destinetion.
-Then, the evaluated path is forwarded to the controller server (‘controller node’) via another request, in order to guide the robot towards the location at issue.
-Once the desired location has been reached, the state changes again (‘Wait’) and the robot ‘sleeps’ for a little time, simulating the room exploration.
-Whatever the state the robot is in, if a ‘battery_low’ message is sent on the corresponding topic by the ‘robot-states’ node, the robot is instructed to drop what it is doing and navigate to the charging room to recharge its battery.
-Specifically, first the state changes to ‘NavigatetoCharge’, whereby the same mechanism as the state ‘Navigate’ is carried out. Then, the node enters the state called ‘Charge’, that simulates the act of recharging the robot’s battery.
-After that, the control is passed again to the state ‘Reason’ and the cycle repeats.</p>
+<span class="target" id="module-state_machine"></span><div class="line-block">
+<div class="line">This node interacts with the other nodes of the software architecture in order to determine the desired behaviour of the robot.</div>
+<div class="line">Specifically, first of all it sets the initial position of the robot, by communicating it to the ‘robot-states’ node. The proper state-machine, composed of 6 states, is then started.</div>
+<div class="line">Once the node enters the firs state (‘BuildEnvironment’), a GUI is printed on the screen, asking for the environment’s characteristics. After that, the desired environment is built, by communicating with the ARMOR server.</div>
+<div class="line">In other words, a series of requests is issued to the ARMOR server, which takes care of the actual creation of the ontology. The control is then passed to the second state (‘Reason’).</div>
+<div class="line">This is in charge of querying the ontology about the rooms adjacent to the one the robot is in. Based on the decision taken in this state, the robot is instructed to go either in an adjacent urgent room or in an adjacent corridor.</div>
+<div class="line">In order to accomplish this task, in a new state (‘Navigate’), first a request is issued to the planner server (‘planner’ node) so as to retrieve a path towards the desired destinetion.</div>
+<div class="line">Then, the evaluated path is forwarded to the controller server (‘controller node’) via another request, in order to guide the robot towards the location at issue.</div>
+<div class="line">Once the desired location has been reached, the state changes again (‘Wait’) and the robot ‘sleeps’ for a little time, simulating the room exploration.</div>
+<div class="line">Whatever the state the robot is in, if a ‘battery_low’ message is sent on the corresponding topic by the ‘robot-states’ node, the robot is instructed to drop what it is doing and navigate to the charging room to recharge its battery.</div>
+<div class="line">Specifically, first the state changes to ‘NavigatetoCharge’, whereby the same mechanism as the state ‘Navigate’ is carried out. Then, the node enters the state called ‘Charge’, that simulates the act of recharging the robot’s battery.</div>
+<div class="line">After that, the control is passed again to the state ‘Reason’ and the cycle repeats.</div>
+</div>
 <dl class="simple">
 <dt>Subscribes to:</dt><dd><ul class="simple">
 <li><p>/state/battery_low</p></li>
@@ -269,18 +277,22 @@ After that, the control is passed again to the state ‘Reason’ and the cycle 
 <dd><p>Class that defines a state whereby the environment is created as the user desires.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The only possible outcome of the implemented state is the string ‘environment_built’.
-The variable ‘sm_targetloc’ shared among the states here is referred as: ‘buildenvironment_targetloc_in’ (as far as the input value is concerned) and ‘buildenvironment_targetloc_out’ (as far as the output value is concerned).
-It contains the location the robot should reach.
-The variable ‘sm_prevstate’ shared among the states here is referred as: ‘buildenvironment_prevstate_in’ (as far as the input value is concerned) and ‘buildenvironment_prevstate_out’ (as far as the output value is concerned).
-It contains the previous state identifier.</p>
+<div class="line-block">
+<div class="line">The only possible outcome of the implemented state is the string ‘environment_built’.</div>
+<div class="line">The variable ‘sm_targetloc’ shared among the states here is referred as: ‘buildenvironment_targetloc_in’ (as far as the input value is concerned) and ‘buildenvironment_targetloc_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the location the robot should reach.</div>
+<div class="line">The variable ‘sm_prevstate’ shared among the states here is referred as: ‘buildenvironment_prevstate_in’ (as far as the input value is concerned) and ‘buildenvironment_prevstate_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the previous state identifier.</div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="scripts.state_machine.BuildEnvironment.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#BuildEnvironment.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.BuildEnvironment.execute" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that this state is executed.</p>
-<p>First, the GUI function is called in order to let the user decide how the environment should be and the retrieved information are stored in lists. Then, the desired environment is built, thanks to a series of requests issued to the ARMOR server, which takes care of the actual creation of the ontology.
-This task is carried out by means of the ‘build_environment’ method belonging to the imported class named ‘EnvironmentOntology’. Finally the global variable ‘transition’ is assigned with the string ‘environment_built’ and it is returned.</p>
+<div class="line-block">
+<div class="line">First, the GUI function is called in order to let the user decide how the environment should be and the retrieved information are stored in lists. Then, the desired environment is built, thanks to a series of requests issued to the ARMOR server, which takes care of the actual creation of the ontology.</div>
+<div class="line">This task is carried out by means of the ‘build_environment’ method belonging to the imported class named ‘EnvironmentOntology’. Finally the global variable ‘transition’ is assigned with the string ‘environment_built’ and it is returned.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -299,20 +311,24 @@ This task is carried out by means of the ‘build_environment’ method belongin
 <dd><p>Class that defines a state that simulates the robot’s battery recharging.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘battery_full’.
-The variable ‘sm_targetloc’ shared among the states here is referred as: ‘charge_targetloc_in’ (as far as the input value is concerned) and ‘charge_targetloc_out’ (as far as the output value is concerned).
-It contains the location the robot should reach.
-The variable ‘sm_prevstate’ shared among the states here is referred as: ‘charge_prevstate_in’ (as far as the input value is concerned) and ‘charge_prevstate_out’ (as far as the output value is concerned).
-It contains the previous state identifier.</p>
+<div class="line-block">
+<div class="line">The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘battery_full’.</div>
+<div class="line">The variable ‘sm_targetloc’ shared among the states here is referred as: ‘charge_targetloc_in’ (as far as the input value is concerned) and ‘charge_targetloc_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the location the robot should reach.</div>
+<div class="line">The variable ‘sm_prevstate’ shared among the states here is referred as: ‘charge_prevstate_in’ (as far as the input value is concerned) and ‘charge_prevstate_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the previous state identifier.</div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="scripts.state_machine.Charge.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Charge.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Charge.execute" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that this state is executed.</p>
-<p>The function simply makes the process sleep for the desired charging time (5 s by default). However, during this period of time, the global variable ‘tansition’ is checked 10 times in order to detect possible ‘battery_low’ signals that have been issued.
-After the total amount of time, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘battery_full’.
-At the end of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
-Finally the global variable ‘transition’ is returned.</p>
+<div class="line-block">
+<div class="line">The function simply makes the process sleep for the desired charging time (5 s by default). However, during this period of time, the global variable ‘tansition’ is checked 10 times in order to detect possible ‘battery_low’ signals that have been issued.</div>
+<div class="line">After the total amount of time, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘battery_full’.</div>
+<div class="line">At the end of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.</div>
+<div class="line">Finally the global variable ‘transition’ is returned.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -331,22 +347,26 @@ Finally the global variable ‘transition’ is returned.</p>
 <dd><p>Class that defines a state whereby a path towards the goal location is generated and the robot is guided along such path.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘target_reached’.
-The variable ‘sm_targetloc’ shared among the states here is referred as: ‘navigate_targetloc_in’ (as far as the input value is concerned) and ‘navigate_targetloc_out’ (as far as the output value is concerned).
-It contains the location the robot should reach.
-The variable ‘sm_prevstate’ shared among the states here is referred as: ‘navigate_prevstate_in’ (as far as the input value is concerned) and ‘navigate_prevstate_out’ (as far as the output value is concerned).
-It contains the previous state identifier.</p>
+<div class="line-block">
+<div class="line">The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘target_reached’.</div>
+<div class="line">The variable ‘sm_targetloc’ shared among the states here is referred as: ‘navigate_targetloc_in’ (as far as the input value is concerned) and ‘navigate_targetloc_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the location the robot should reach.</div>
+<div class="line">The variable ‘sm_prevstate’ shared among the states here is referred as: ‘navigate_prevstate_in’ (as far as the input value is concerned) and ‘navigate_prevstate_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the previous state identifier.</div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="scripts.state_machine.Navigate.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Navigate.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Navigate.execute" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that this state is executed.</p>
-<p>First, a request to the ‘planner’ server, containing the desired location that has been determined in the ‘Reason’ state, is sent. The server generates and returns a series of via-point towards the location at issue.
-This list is passed on in form of a request to the ‘controller’ server which guides the robot along such path. During the accomplishment of this task the global variable ‘transition’ is continuously checked.
-If, by the time the ‘controller’ server finished performing the task, the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘target_reached’.
-At the beginning of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
-At the end of the function instead, once the ‘controller’ server returned succesfully, the ‘update_robot_location’ and ‘update_robot_stamp’ methods are executed so as to update both the robot timestamp related to the last time it moved and its location.
-Finally the global variable ‘transition’ is returned.</p>
+<div class="line-block">
+<div class="line">First, a request to the ‘planner’ server, containing the desired location that has been determined in the ‘Reason’ state, is sent. The server generates and returns a series of via-point towards the location at issue.</div>
+<div class="line">This list is passed on in form of a request to the ‘controller’ server which guides the robot along such path. During the accomplishment of this task the global variable ‘transition’ is continuously checked.</div>
+<div class="line">If, by the time the ‘controller’ server finished performing the task, the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘target_reached’.</div>
+<div class="line">At the beginning of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.</div>
+<div class="line">At the end of the function instead, once the ‘controller’ server returned succesfully, the ‘update_robot_location’ and ‘update_robot_stamp’ methods are executed so as to update both the robot timestamp related to the last time it moved and its location.</div>
+<div class="line">Finally the global variable ‘transition’ is returned.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -365,22 +385,27 @@ Finally the global variable ‘transition’ is returned.</p>
 <dd><p>Class that defines a state whereby a path towards the charging room is generated and the robot is guided along such path.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘target_reached’.
-The variable ‘sm_targetloc’ shared among the states here is referred as: ‘navigatetocharge_targetloc_in’ (as far as the input value is concerned) and ‘navigatetocharge_targetloc_out’ (as far as the output value is concerned).
-It contains the location the robot should reach.
-The variable ‘sm_prevstate’ shared among the states here is referred as: ‘navigatetocharge_prevstate_in’ (as far as the input value is concerned) and ‘navigatetocharge_prevstate_out’ (as far as the output value is concerned).
-It contains the previous state identifier.</p>
+<div class="line-block">
+<div class="line">The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘target_reached’.</div>
+<div class="line">The variable ‘sm_targetloc’ shared among the states here is referred as: ‘navigatetocharge_targetloc_in’ (as far as the input value is concerned) and ‘navigatetocharge_targetloc_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the location the robot should reach.</div>
+<div class="line">The variable ‘sm_prevstate’ shared among the states here is referred as: ‘navigatetocharge_prevstate_in’ (as far as the input value is concerned) and ‘navigatetocharge_prevstate_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the previous state identifier.</div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="scripts.state_machine.NavigatetoCharge.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#NavigatetoCharge.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.NavigatetoCharge.execute" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that this state is executed.</p>
-<p>If the previous state was not ‘NavigatetoCharge’, possible control goals are cancelled and a request to the ‘planner’ server, containing the charging room, is sent. The server generates and returns a series of via-point towards the location at issue.
-This list is passed on in form of a request to the ‘controller’ server which guides the robot along such path. During the accomplishment of this task the global variable ‘transition’ is continuously checked.
-If, by the time the ‘controller’ server finished performing the task, the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘target_reached’.
-At the beginning of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
-At the end of the function instead, once the ‘controller’ server returned succesfully, the ‘update_robot_location’ and ‘update_robot_stamp’ methods are executed so as to update both the robot timestamp related to the last time it moved and its location.
-Finally the global variable ‘transition’ is returned.</p>
+<div class="line-block">
+<div class="line">If the previous state was not ‘NavigatetoCharge’, possible control goals are cancelled. Then, if the robot is not already in the charging room, a request to the ‘planner’ server, containing the charging room, is sent.</div>
+<div class="line">The server generates and returns a series of via-points towards the location at issue. This list is passed on in form of a request to the ‘controller’ server which guides the robot along such path.</div>
+<div class="line">During the accomplishment of this task the global variable ‘transition’ is continuously checked. If, by the time the ‘controller’ server finished performing the task, the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘target_reached’.</div>
+<div class="line">If it is the case that the robot is already in the charging room, the planning and controlling are not performed and simply the global variable is updated to ‘target_reached’.</div>
+<div class="line">At the beginning of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.</div>
+<div class="line">At the end of the function instead, either once the ‘controller’ server returned succesfully or once the process detects that the robot is already in the charging room, the ‘update_robot_location’ and ‘update_robot_stamp’ methods are executed so as to update both the robot timestamp related to the last time it moved and its location.</div>
+<div class="line">Finally the global variable ‘transition’ is returned.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -399,19 +424,23 @@ Finally the global variable ‘transition’ is returned.</p>
 <dd><p>Class that defines a state whereby the created ontology is interrogated in order to retrieve information about the locations adjacent to the room that the robot is in.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘done_reasoning’.
-The variable ‘sm_targetloc’ shared among the states here is referred as: ‘reason_targetloc_in’ (as far as the input value is concerned) and ‘reason_targetloc_out’ (as far as the output value is concerned).
-It contains the location the robot should reach.
-The variable ‘sm_prevstate’ shared among the states here is referred as: ‘reason_prevstate_in’ (as far as the input value is concerned) and ‘reason_prevstate_out’ (as far as the output value is concerned).
-It contains the previous state identifier.</p>
+<div class="line-block">
+<div class="line">The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘done_reasoning’.</div>
+<div class="line">The variable ‘sm_targetloc’ shared among the states here is referred as: ‘reason_targetloc_in’ (as far as the input value is concerned) and ‘reason_targetloc_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the location the robot should reach.</div>
+<div class="line">The variable ‘sm_prevstate’ shared among the states here is referred as: ‘reason_prevstate_in’ (as far as the input value is concerned) and ‘reason_prevstate_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the previous state identifier.</div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="scripts.state_machine.Reason.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Reason.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Reason.execute" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that this state is executed.</p>
-<p>First, the ‘urgent_check’ method belonging to the imported class named ‘EnvironmentOntology’ is executed to find out if there is an urgent room among the adjacent ones.
-Based on this check, the method at issue returns the location that the robot should reach, which is then stored in the output variable ‘reason_targetloc_out’.
-Finally, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘done_reasoning’ and it is returned.</p>
+<div class="line-block">
+<div class="line">First, the ‘urgent_check’ method belonging to the imported class named ‘EnvironmentOntology’ is executed to find out if there is an urgent room among the adjacent ones.</div>
+<div class="line">Based on this check, the method at issue returns the location that the robot should reach, which is then stored in the output variable ‘reason_targetloc_out’.</div>
+<div class="line">Finally, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘done_reasoning’ and it is returned.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -430,20 +459,24 @@ Finally, if the value of the global variable ‘transition’ has not changed in
 <dd><p>Class that defines a state that simulates the robot exploring the reached location.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘waited_enough’.
-The variable ‘sm_targetloc’ shared among the states here is referred as: ‘wait_targetloc_in’ (as far as the input value is concerned) and ‘wait_targetloc_out’ (as far as the output value is concerned).
-It contains the location the robot should reach.
-The variable ‘sm_prevstate’ shared among the states here is referred as: ‘wait_prevstate_in’ (as far as the input value is concerned) and ‘wait_prevstate_out’ (as far as the output value is concerned).
-It contains the previous state identifier.</p>
+<div class="line-block">
+<div class="line">The possible outcomes of the implemented state are the strings ‘battery_low’ and ‘waited_enough’.</div>
+<div class="line">The variable ‘sm_targetloc’ shared among the states here is referred as: ‘wait_targetloc_in’ (as far as the input value is concerned) and ‘wait_targetloc_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the location the robot should reach.</div>
+<div class="line">The variable ‘sm_prevstate’ shared among the states here is referred as: ‘wait_prevstate_in’ (as far as the input value is concerned) and ‘wait_prevstate_out’ (as far as the output value is concerned).</div>
+<div class="line">It contains the previous state identifier.</div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="scripts.state_machine.Wait.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Wait.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Wait.execute" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called every time that this state is executed.</p>
-<p>The function simply makes the process sleep for the desired ‘exploring’ time (5 s by default). However, during this period of time, the global variable ‘tansition’ is checked 10 times in order to detect possible ‘battery_low’ signals that have been issued.
-After the total amount of time, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘waited_enough’.
-At the end of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.
-Finally the global variable ‘transition’ is returned.</p>
+<div class="line-block">
+<div class="line">The function simply makes the process sleep for the desired ‘exploring’ time (5 s by default). However, during this period of time, the global variable ‘tansition’ is checked 10 times in order to detect possible ‘battery_low’ signals that have been issued.</div>
+<div class="line">After the total amount of time, if the value of the global variable ‘transition’ has not changed into ‘battery low’, it is assigned with the string ‘waited_enough’.</div>
+<div class="line">At the end of the fuction, the ‘update_room_stamp’ method belonging to the imported class named ‘EnvironmentOntology’ is executed so as to update the timestamp that takes into account the last time a location was visited.</div>
+<div class="line">Finally the global variable ‘transition’ is returned.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -544,8 +577,10 @@ corridors_list (str list): list containing the lables associated with all the co
 <dt class="sig sig-object py" id="scripts.state_machine.plan">
 <span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.plan" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called in order to send requests belonging to the ‘motion/planner’ action service.</p>
-<p>First, the goal location passed as argument is sent in form of request to the action server. Then, the process waits for the path towards the location to be generated.
-When the action server provides the path, it is stored in a variable and returned.</p>
+<div class="line-block">
+<div class="line">First, the goal location passed as argument is sent in form of request to the action server. Then, the process waits for the path towards the location to be generated.</div>
+<div class="line">When the action server provides the path, it is stored in a variable and returned.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>location</strong> (<em>str</em>) – label of the location that the robot has to reach</p>
@@ -563,8 +598,10 @@ When the action server provides the path, it is stored in a variable and returne
 <dt class="sig sig-object py" id="scripts.state_machine.set_initial_pose">
 <span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">set_initial_pose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#set_initial_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.set_initial_pose" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called in order to send requests belonging to the ‘/state/set_pose’ service.</p>
-<p>After the service is defined and initialised, the inital pose of the robot is retrieved from the parameter server. Then, this pose is sent in form of request to the server.
-The user is notified both if the service call fails and if it succeds.</p>
+<div class="line-block">
+<div class="line">After the service is defined and initialised, the inital pose of the robot is retrieved from the parameter server. Then, this pose is sent in form of request to the server.</div>
+<div class="line">The user is notified both if the service call fails and if it succeds.</div>
+</div>
 </dd></dl>
 
 <dl class="py data">
@@ -583,17 +620,20 @@ The user is notified both if the service call fails and if it succeds.</p>
 <dd><p>Class that allows for the creation of instances representing ontologies and for the interaction with the ARMOR server, which manages the corresponding ontologies.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.build_environment">
-<span class="sig-name descname"><span class="pre">build_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ontology_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_n_corridors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms_corridor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rooms_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doors_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corridors_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.build_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.build_environment" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">build_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ontology_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ontology_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_n_corridors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms_corridor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rooms_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doors_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corridors_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.build_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.build_environment" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called in order to construct the desired ontology.</p>
-<p>First, the plain ontology (ontology without the Abox) is loaded. Then, based on the arguments that have been passed to the function, some manipulations of the ontology are performed.
-In particular for each location the doors are specified and all the defined individuals are made disjointed between each other.
-In addition to that, the robot is positioned in the charging room and the timestamp of the last time a location has been visited is initialised for each location.
-Finally, the reasoner is instructed to reason about the changes that were made and the constructed ontology (ontology with the Abox) is saved with the name passed as argument.
-Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<div class="line-block">
+<div class="line">First, the plain ontology (ontology without the Abox) is loaded. Then, based on the arguments that have been passed to the function, some manipulations of the ontology are performed.</div>
+<div class="line">In particular for each location the doors are specified and all the defined individuals are made disjointed between each other.</div>
+<div class="line">In addition to that, the robot is positioned in the charging room and the timestamp of the last time a location has been visited is initialised for each location.</div>
+<div class="line">Finally, the reasoner is instructed to reason about the changes that were made and the constructed ontology (ontology with the Abox) is saved with the name passed as argument.</div>
+<div class="line">Note that all these actions are performed by interacting with the ontology via the ARMOR server.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> – variable that refers to the class instance</p></li>
+<li><p><strong>ontology_path</strong> (<em>str</em>) – string that specifies the path to the folder that contains the ontologies</p></li>
 <li><p><strong>ontology_name</strong> (<em>str</em>) – string that specifies the name the contructed ontology is saved with</p></li>
 <li><p><strong>tot_n_corridors</strong> (<em>int</em>) – total number of corridors in the desired environment</p></li>
 <li><p><strong>rooms_corridor</strong> (<em>int array</em>) – array containing the number of rooms connected to each corridor in the desired environment</p></li>
@@ -635,9 +675,11 @@ Note that all these actions are performed by interacting with the ontology via t
 <dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.update_robot_location">
 <span class="sig-name descname"><span class="pre">update_robot_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reached_location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.update_robot_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.update_robot_location" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called in order to update where the robot is.</p>
-<p>First, the ontology is queried in order to retrieve the location that the robot is in. Then, the just-retrieved location is replaced with the location passed as argument.
-Finally, the reasoner is instructed to reason about the changes that were made.
-Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<div class="line-block">
+<div class="line">First, the ontology is queried in order to retrieve the location that the robot is in. Then, the just-retrieved location is replaced with the location passed as argument.</div>
+<div class="line">Finally, the reasoner is instructed to reason about the changes that were made.</div>
+<div class="line">Note that all these actions are performed by interacting with the ontology via the ARMOR server.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -652,9 +694,11 @@ Note that all these actions are performed by interacting with the ontology via t
 <dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.update_robot_stamp">
 <span class="sig-name descname"><span class="pre">update_robot_stamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.update_robot_stamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.update_robot_stamp" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called in order to update the timestamp that takes into account the last time the robot moved.</p>
-<p>First, the ontology is queried in order to retrieve the timestamp of the last time the robot moved. Then, the just-retrieved timestamp is replaced with the current time.
-Finally, the reasoner is instructed to reason about the changes that were made.
-Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<div class="line-block">
+<div class="line">First, the ontology is queried in order to retrieve the timestamp of the last time the robot moved. Then, the just-retrieved timestamp is replaced with the current time.</div>
+<div class="line">Finally, the reasoner is instructed to reason about the changes that were made.</div>
+<div class="line">Note that all these actions are performed by interacting with the ontology via the ARMOR server.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>self</strong> – variable that refers to the class instance</p>
@@ -666,12 +710,21 @@ Note that all these actions are performed by interacting with the ontology via t
 <dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.update_room_stamp">
 <span class="sig-name descname"><span class="pre">update_room_stamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.update_room_stamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.update_room_stamp" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called in order to update the timestamp that takes into account the last time a location was visited.</p>
-<p>First, the ontology is queried in order to retrieve both the location that the robot is in and the timestamp of the last time the robot visited such location.
-Then, the just-retrieved timestamp is replaced with the current time. Finally, the reasoner is instructed to reason about the changes that were made.
-Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<div class="line-block">
+<div class="line">First, the ontology is queried in order to retrieve both the location that the robot is in and the timestamp of the last time the robot visited such location.</div>
+<div class="line">Then, the just-retrieved timestamp is replaced with the current time. Finally, the reasoner is instructed to reason about the changes that were made.</div>
+<div class="line">Note that all these actions are performed by interacting with the ontology via the ARMOR server.</div>
+<div class="line">The function returns the current robot location that it retrieved from the ontology.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>self</strong> – variable that refers to the class instance</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>string that specifies the current robot location</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>current_location (str)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -680,9 +733,11 @@ Note that all these actions are performed by interacting with the ontology via t
 <dt class="sig sig-object py" id="scripts.custom_classes.EnvironmentOntology.urgent_check">
 <span class="sig-name descname"><span class="pre">urgent_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/custom_classes.html#EnvironmentOntology.urgent_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.custom_classes.EnvironmentOntology.urgent_check" title="Permalink to this definition"></a></dt>
 <dd><p>Function that is called in order to determine the location that the robot should reach next.</p>
-<p>First, the ontology is queried so as to retrieve the locations that the robot can reach. Then, the labels associated to reachable locations are checked in order to detect urgent locations and corridors.
-If no urgent location has been detected, then a corridor, randomly chosen among the reachable locations, is returned. Otherwise an urgent location, randomly chosen among the reachable locations, is returned.
-Note that all these actions are performed by interacting with the ontology via the ARMOR server.</p>
+<div class="line-block">
+<div class="line">First, the ontology is queried so as to retrieve the locations that the robot can reach. Then, the labels associated to reachable locations are checked in order to detect urgent locations and corridors.</div>
+<div class="line">If no urgent location has been detected, then a corridor, randomly chosen among the reachable locations, is returned. Otherwise an urgent location, randomly chosen among the reachable locations, is returned.</div>
+<div class="line">Note that all these actions are performed by interacting with the ontology via the ARMOR server.</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>self</strong> – variable that refers to the class instance</p>

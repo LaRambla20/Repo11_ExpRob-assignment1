@@ -71,8 +71,8 @@
 
 <span class="sd">.. moduleauthor:: Emanuele Rambaldi &lt;emanuele.rambaldi3@studio.unibo.it&gt;</span>
 
-<span class="sd">Given a path as a set of via-points, via a client request, the node at issue simulates the movements to reach each point with a random delay. </span>
-<span class="sd">Furthermore the node updates the current robot position stored in the &#39;robot-states&#39; node every time that a via-point has supposedly been reached.</span>
+<span class="sd">|  Given a path as a set of via-points, via a client request, the node at issue simulates the movements to reach each point with a random delay. </span>
+<span class="sd">|  Furthermore the node updates the current robot position stored in the &#39;robot-states&#39; node every time that a via-point has supposedly been reached.</span>
 
 <span class="sd">Client:</span>
 <span class="sd">    - /state/set_pose</span>
@@ -113,8 +113,8 @@
 
         <span class="sd">&quot;&quot;&quot; (constructor) Function that is called whenever an instance of this class is defined.</span>
 
-<span class="sd">        First, a parameter, needed for determining the functioning of the dummy control algorithm, is retrieved from the parameter server. </span>
-<span class="sd">        Then, the actions server that answers to requests belonging to the &#39;motion/controller&#39; action service and assigns the &#39;execute_callback&#39; function to it.</span>
+<span class="sd">        |  First, a parameter, needed for determining the functioning of the dummy control algorithm, is retrieved from the parameter server. </span>
+<span class="sd">        |  Then, the actions server that answers to requests belonging to the &#39;motion/controller&#39; action service and assigns the &#39;execute_callback&#39; function to it.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -145,8 +145,8 @@
 
         <span class="sd">&quot;&quot;&quot; Function that is called every time that a client goal-request related to the &#39;motion/controller&#39; action service is received.</span>
 
-<span class="sd">        This function requires a list of via points (i.e., the path), and it simulates a movement through each point with a delay spanning in a predefined range.</span>
-<span class="sd">        As soon as each via point is reached, the related robot position is updated in the &#39;robot-state&#39; node.</span>
+<span class="sd">        |  This function requires a list of via points (i.e., the path), and it simulates a movement through each point with a delay spanning in a predefined range.</span>
+<span class="sd">        |  As soon as each via point is reached, the related robot position is updated in the &#39;robot-state&#39; node.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>

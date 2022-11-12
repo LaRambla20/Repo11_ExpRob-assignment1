@@ -112,8 +112,8 @@
 
         <span class="sd">&quot;&quot;&quot; (constructor) Function that is called whenever an instance of this class is defined.</span>
 
-<span class="sd">        First, some parameters, needed for determining the functioning of the dummy planning algorithm, are retrieved from the parameter server. </span>
-<span class="sd">        Then, the actions server that answers to requests belonging to the &#39;motion/planner&#39; action service and assigns the &#39;execute_callback&#39; function to it.</span>
+<span class="sd">        |  First, some parameters, needed for determining the functioning of the dummy planning algorithm, are retrieved from the parameter server. </span>
+<span class="sd">        |  Then, the actions server that answers to requests belonging to the &#39;motion/planner&#39; action service and assigns the &#39;execute_callback&#39; function to it.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -149,10 +149,10 @@
 
         <span class="sd">&quot;&quot;&quot; Function that is called every time that a client goal-request related to the &#39;motion/planner&#39; action service is received.</span>
 
-<span class="sd">        This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the &#39;robot-state&#39; node), while the last </span>
-<span class="sd">        point is the &#39;goal&#39; position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range. </span>
-<span class="sd">        To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.</span>
-<span class="sd">        The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner. </span>
+<span class="sd">        |  This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the &#39;robot-state&#39; node), while the last </span>
+<span class="sd">        |  point is the &#39;goal&#39; position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range. </span>
+<span class="sd">        |  To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.</span>
+<span class="sd">        |  The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner. </span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>

@@ -69,7 +69,7 @@
 <span class="c1"># - run the ARMOR server</span>
 <span class="c1">#          $ rosrun armor execute it.emarolab.armor.ARMORMainService</span>
 <span class="c1"># - run the &#39;roscore&#39; and then you can launch the SW architecture</span>
-<span class="c1">#          $ roslaunch exprob_first_assignment software_architecture.launch ontology_name:=&quot;pippo&quot;</span>
+<span class="c1">#          $ roslaunch exprob_first_assignment software_architecture.launch ontology_path:=&quot;path-to-the-topological-map-folder&quot; ontology_name:=&quot;name-of-the-constructed-ontology&quot;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">.. module:: state_machine</span>
@@ -78,17 +78,17 @@
 
 <span class="sd">.. moduleauthor:: Emanuele Rambaldi &lt;emanuele.rambaldi3@studio.unibo.it&gt;</span>
 
-<span class="sd">This node interacts with the other nodes of the software architecture in order to determine the desired behaviour of the robot. </span>
-<span class="sd">Specifically, first of all it sets the initial position of the robot, by communicating it to the &#39;robot-states&#39; node. The proper state-machine, composed of 6 states, is then started.</span>
-<span class="sd">Once the node enters the firs state (&#39;BuildEnvironment&#39;), a GUI is printed on the screen, asking for the environment&#39;s characteristics. After that, the desired environment is built, by communicating with the ARMOR server.</span>
-<span class="sd">In other words, a series of requests is issued to the ARMOR server, which takes care of the actual creation of the ontology. The control is then passed to the second state (&#39;Reason&#39;). </span>
-<span class="sd">This is in charge of querying the ontology about the rooms adjacent to the one the robot is in. Based on the decision taken in this state, the robot is instructed to go either in an adjacent urgent room or in an adjacent corridor. </span>
-<span class="sd">In order to accomplish this task, in a new state (&#39;Navigate&#39;), first a request is issued to the planner server (&#39;planner&#39; node) so as to retrieve a path towards the desired destinetion. </span>
-<span class="sd">Then, the evaluated path is forwarded to the controller server (&#39;controller node&#39;) via another request, in order to guide the robot towards the location at issue. </span>
-<span class="sd">Once the desired location has been reached, the state changes again (&#39;Wait&#39;) and the robot &#39;sleeps&#39; for a little time, simulating the room exploration. </span>
-<span class="sd">Whatever the state the robot is in, if a &#39;battery_low&#39; message is sent on the corresponding topic by the &#39;robot-states&#39; node, the robot is instructed to drop what it is doing and navigate to the charging room to recharge its battery.</span>
-<span class="sd">Specifically, first the state changes to &#39;NavigatetoCharge&#39;, whereby the same mechanism as the state &#39;Navigate&#39; is carried out. Then, the node enters the state called &#39;Charge&#39;, that simulates the act of recharging the robot&#39;s battery.</span>
-<span class="sd">After that, the control is passed again to the state &#39;Reason&#39; and the cycle repeats.</span>
+<span class="sd">|  This node interacts with the other nodes of the software architecture in order to determine the desired behaviour of the robot. </span>
+<span class="sd">|  Specifically, first of all it sets the initial position of the robot, by communicating it to the &#39;robot-states&#39; node. The proper state-machine, composed of 6 states, is then started.</span>
+<span class="sd">|  Once the node enters the firs state (&#39;BuildEnvironment&#39;), a GUI is printed on the screen, asking for the environment&#39;s characteristics. After that, the desired environment is built, by communicating with the ARMOR server.</span>
+<span class="sd">|  In other words, a series of requests is issued to the ARMOR server, which takes care of the actual creation of the ontology. The control is then passed to the second state (&#39;Reason&#39;). </span>
+<span class="sd">|  This is in charge of querying the ontology about the rooms adjacent to the one the robot is in. Based on the decision taken in this state, the robot is instructed to go either in an adjacent urgent room or in an adjacent corridor. </span>
+<span class="sd">|  In order to accomplish this task, in a new state (&#39;Navigate&#39;), first a request is issued to the planner server (&#39;planner&#39; node) so as to retrieve a path towards the desired destinetion. </span>
+<span class="sd">|  Then, the evaluated path is forwarded to the controller server (&#39;controller node&#39;) via another request, in order to guide the robot towards the location at issue. </span>
+<span class="sd">|  Once the desired location has been reached, the state changes again (&#39;Wait&#39;) and the robot &#39;sleeps&#39; for a little time, simulating the room exploration. </span>
+<span class="sd">|  Whatever the state the robot is in, if a &#39;battery_low&#39; message is sent on the corresponding topic by the &#39;robot-states&#39; node, the robot is instructed to drop what it is doing and navigate to the charging room to recharge its battery.</span>
+<span class="sd">|  Specifically, first the state changes to &#39;NavigatetoCharge&#39;, whereby the same mechanism as the state &#39;Navigate&#39; is carried out. Then, the node enters the state called &#39;Charge&#39;, that simulates the act of recharging the robot&#39;s battery.</span>
+<span class="sd">|  After that, the control is passed again to the state &#39;Reason&#39; and the cycle repeats.</span>
 
 
 <span class="sd">Subscribes to:</span>
@@ -141,8 +141,7 @@
 <span class="c1"># GLOBAL VARIABLES</span>
 
 <span class="c1"># global action clients</span>
-<span class="n">actcli_plan</span> <span class="o">=</span> <span class="n">actionlib</span><span class="o">.</span><span class="n">SimpleActionClient</span><span class="p">(</span><span class="s1">&#39;motion/planner&#39;</span><span class="p">,</span> <span class="n">PlanAction</span><span class="p">)</span> 
-<span class="c1">#initialize and define the global action client that sends requests belonging to the &#39;motion/planner&#39; action</span>
+<span class="n">actcli_plan</span> <span class="o">=</span> <span class="n">actionlib</span><span class="o">.</span><span class="n">SimpleActionClient</span><span class="p">(</span><span class="s1">&#39;motion/planner&#39;</span><span class="p">,</span> <span class="n">PlanAction</span><span class="p">)</span> <span class="c1">#initialize and define the global action client that sends requests belonging to the &#39;motion/planner&#39; action</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Global action client the task of which is to ask the &#39;planner&#39; server to generate a path towards a desired location</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -309,8 +308,8 @@
 
     <span class="sd">&quot;&quot;&quot;Function that is called in order to send requests belonging to the &#39;/state/set_pose&#39; service.</span>
 
-<span class="sd">    After the service is defined and initialised, the inital pose of the robot is retrieved from the parameter server. Then, this pose is sent in form of request to the server. </span>
-<span class="sd">    The user is notified both if the service call fails and if it succeds.</span>
+<span class="sd">    |  After the service is defined and initialised, the inital pose of the robot is retrieved from the parameter server. Then, this pose is sent in form of request to the server. </span>
+<span class="sd">    |  The user is notified both if the service call fails and if it succeds.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -409,8 +408,8 @@
 
     <span class="sd">&quot;&quot;&quot;Function that is called in order to send requests belonging to the &#39;motion/planner&#39; action service.</span>
 
-<span class="sd">    First, the goal location passed as argument is sent in form of request to the action server. Then, the process waits for the path towards the location to be generated.</span>
-<span class="sd">    When the action server provides the path, it is stored in a variable and returned.</span>
+<span class="sd">    |  First, the goal location passed as argument is sent in form of request to the action server. Then, the process waits for the path towards the location to be generated.</span>
+<span class="sd">    |  When the action server provides the path, it is stored in a variable and returned.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        location (str): label of the location that the robot has to reach</span>
@@ -472,11 +471,11 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The only possible outcome of the implemented state is the string &#39;environment_built&#39;.</span>
-<span class="sd">        The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;buildenvironment_targetloc_in&#39; (as far as the input value is concerned) and &#39;buildenvironment_targetloc_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the location the robot should reach.</span>
-<span class="sd">        The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;buildenvironment_prevstate_in&#39; (as far as the input value is concerned) and &#39;buildenvironment_prevstate_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the previous state identifier.</span>
+<span class="sd">        |  The only possible outcome of the implemented state is the string &#39;environment_built&#39;.</span>
+<span class="sd">        |  The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;buildenvironment_targetloc_in&#39; (as far as the input value is concerned) and &#39;buildenvironment_targetloc_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the location the robot should reach.</span>
+<span class="sd">        |  The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;buildenvironment_prevstate_in&#39; (as far as the input value is concerned) and &#39;buildenvironment_prevstate_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the previous state identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -504,8 +503,8 @@
 
         <span class="sd">&quot;&quot;&quot;Function that is called every time that this state is executed.</span>
 
-<span class="sd">        First, the GUI function is called in order to let the user decide how the environment should be and the retrieved information are stored in lists. Then, the desired environment is built, thanks to a series of requests issued to the ARMOR server, which takes care of the actual creation of the ontology.</span>
-<span class="sd">        This task is carried out by means of the &#39;build_environment&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39;. Finally the global variable &#39;transition&#39; is assigned with the string &#39;environment_built&#39; and it is returned.</span>
+<span class="sd">        |  First, the GUI function is called in order to let the user decide how the environment should be and the retrieved information are stored in lists. Then, the desired environment is built, thanks to a series of requests issued to the ARMOR server, which takes care of the actual creation of the ontology.</span>
+<span class="sd">        |  This task is carried out by means of the &#39;build_environment&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39;. Finally the global variable &#39;transition&#39; is assigned with the string &#39;environment_built&#39; and it is returned.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -532,7 +531,8 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[91m&#39;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">too many or not enough arguments provided&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span> <span class="o">+</span> <span class="s2">&quot; -&gt; exiting&quot;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">ontology_name</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ontology_path</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ontology_name</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="c1"># execute the GUI function</span>
         <span class="n">tot_n_rooms</span><span class="p">,</span> <span class="n">tot_n_corridors</span><span class="p">,</span> <span class="n">rooms_corridor</span><span class="p">,</span> <span class="n">n_rooms_left</span><span class="p">,</span> <span class="n">connection</span> <span class="o">=</span> <span class="n">gui_function</span><span class="p">()</span>
@@ -548,7 +548,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[92m&#39;</span> <span class="o">+</span> <span class="s2">&quot;Building the desired environment...&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">build_environment</span><span class="p">(</span><span class="n">ontology_name</span><span class="p">,</span> <span class="n">tot_n_corridors</span><span class="p">,</span> <span class="n">rooms_corridor</span><span class="p">,</span> <span class="n">n_rooms_left</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">doors_list</span><span class="p">,</span> <span class="n">corridors_list</span><span class="p">,</span> <span class="n">rooms_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_environment</span><span class="p">(</span><span class="n">ontology_path</span><span class="p">,</span> <span class="n">ontology_name</span><span class="p">,</span> <span class="n">tot_n_corridors</span><span class="p">,</span> <span class="n">rooms_corridor</span><span class="p">,</span> <span class="n">n_rooms_left</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">doors_list</span><span class="p">,</span> <span class="n">corridors_list</span><span class="p">,</span> <span class="n">rooms_list</span><span class="p">)</span>
 
         <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
@@ -569,11 +569,11 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;done_reasoning&#39;.</span>
-<span class="sd">        The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;reason_targetloc_in&#39; (as far as the input value is concerned) and &#39;reason_targetloc_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the location the robot should reach.</span>
-<span class="sd">        The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;reason_prevstate_in&#39; (as far as the input value is concerned) and &#39;reason_prevstate_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the previous state identifier.</span>
+<span class="sd">        |  The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;done_reasoning&#39;.</span>
+<span class="sd">        |  The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;reason_targetloc_in&#39; (as far as the input value is concerned) and &#39;reason_targetloc_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the location the robot should reach.</span>
+<span class="sd">        |  The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;reason_prevstate_in&#39; (as far as the input value is concerned) and &#39;reason_prevstate_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the previous state identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -601,9 +601,9 @@
 
         <span class="sd">&quot;&quot;&quot;Function that is called every time that this state is executed.</span>
 
-<span class="sd">        First, the &#39;urgent_check&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed to find out if there is an urgent room among the adjacent ones.</span>
-<span class="sd">        Based on this check, the method at issue returns the location that the robot should reach, which is then stored in the output variable &#39;reason_targetloc_out&#39;. </span>
-<span class="sd">        Finally, if the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;done_reasoning&#39; and it is returned.</span>
+<span class="sd">        |  First, the &#39;urgent_check&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed to find out if there is an urgent room among the adjacent ones.</span>
+<span class="sd">        |  Based on this check, the method at issue returns the location that the robot should reach, which is then stored in the output variable &#39;reason_targetloc_out&#39;. </span>
+<span class="sd">        |  Finally, if the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;done_reasoning&#39; and it is returned.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -654,11 +654,11 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;battery_full&#39;.</span>
-<span class="sd">        The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;charge_targetloc_in&#39; (as far as the input value is concerned) and &#39;charge_targetloc_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the location the robot should reach.</span>
-<span class="sd">        The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;charge_prevstate_in&#39; (as far as the input value is concerned) and &#39;charge_prevstate_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the previous state identifier.</span>
+<span class="sd">        |  The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;battery_full&#39;.</span>
+<span class="sd">        |  The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;charge_targetloc_in&#39; (as far as the input value is concerned) and &#39;charge_targetloc_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the location the robot should reach.</span>
+<span class="sd">        |  The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;charge_prevstate_in&#39; (as far as the input value is concerned) and &#39;charge_prevstate_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the previous state identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -688,10 +688,10 @@
 
         <span class="sd">&quot;&quot;&quot;Function that is called every time that this state is executed.</span>
 
-<span class="sd">        The function simply makes the process sleep for the desired charging time (5 s by default). However, during this period of time, the global variable &#39;tansition&#39; is checked 10 times in order to detect possible &#39;battery_low&#39; signals that have been issued.</span>
-<span class="sd">        After the total amount of time, if the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;battery_full&#39;.</span>
-<span class="sd">        At the end of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
-<span class="sd">        Finally the global variable &#39;transition&#39; is returned.</span>
+<span class="sd">        |  The function simply makes the process sleep for the desired charging time (5 s by default). However, during this period of time, the global variable &#39;tansition&#39; is checked 10 times in order to detect possible &#39;battery_low&#39; signals that have been issued.</span>
+<span class="sd">        |  After the total amount of time, if the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;battery_full&#39;.</span>
+<span class="sd">        |  At the end of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
+<span class="sd">        |  Finally the global variable &#39;transition&#39; is returned.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -764,11 +764,11 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;target_reached&#39;.</span>
-<span class="sd">        The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;navigate_targetloc_in&#39; (as far as the input value is concerned) and &#39;navigate_targetloc_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the location the robot should reach.</span>
-<span class="sd">        The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;navigate_prevstate_in&#39; (as far as the input value is concerned) and &#39;navigate_prevstate_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the previous state identifier.</span>
+<span class="sd">        |  The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;target_reached&#39;.</span>
+<span class="sd">        |  The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;navigate_targetloc_in&#39; (as far as the input value is concerned) and &#39;navigate_targetloc_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the location the robot should reach.</span>
+<span class="sd">        |  The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;navigate_prevstate_in&#39; (as far as the input value is concerned) and &#39;navigate_prevstate_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the previous state identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -796,12 +796,12 @@
 
         <span class="sd">&quot;&quot;&quot;Function that is called every time that this state is executed.</span>
 
-<span class="sd">        First, a request to the &#39;planner&#39; server, containing the desired location that has been determined in the &#39;Reason&#39; state, is sent. The server generates and returns a series of via-point towards the location at issue. </span>
-<span class="sd">        This list is passed on in form of a request to the &#39;controller&#39; server which guides the robot along such path. During the accomplishment of this task the global variable &#39;transition&#39; is continuously checked.</span>
-<span class="sd">        If, by the time the &#39;controller&#39; server finished performing the task, the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;target_reached&#39;.</span>
-<span class="sd">        At the beginning of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
-<span class="sd">        At the end of the function instead, once the &#39;controller&#39; server returned succesfully, the &#39;update_robot_location&#39; and &#39;update_robot_stamp&#39; methods are executed so as to update both the robot timestamp related to the last time it moved and its location.</span>
-<span class="sd">        Finally the global variable &#39;transition&#39; is returned.</span>
+<span class="sd">        |  First, a request to the &#39;planner&#39; server, containing the desired location that has been determined in the &#39;Reason&#39; state, is sent. The server generates and returns a series of via-point towards the location at issue. </span>
+<span class="sd">        |  This list is passed on in form of a request to the &#39;controller&#39; server which guides the robot along such path. During the accomplishment of this task the global variable &#39;transition&#39; is continuously checked.</span>
+<span class="sd">        |  If, by the time the &#39;controller&#39; server finished performing the task, the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;target_reached&#39;.</span>
+<span class="sd">        |  At the beginning of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
+<span class="sd">        |  At the end of the function instead, once the &#39;controller&#39; server returned succesfully, the &#39;update_robot_location&#39; and &#39;update_robot_stamp&#39; methods are executed so as to update both the robot timestamp related to the last time it moved and its location.</span>
+<span class="sd">        |  Finally the global variable &#39;transition&#39; is returned.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -883,11 +883,11 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;target_reached&#39;.</span>
-<span class="sd">        The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;navigatetocharge_targetloc_in&#39; (as far as the input value is concerned) and &#39;navigatetocharge_targetloc_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the location the robot should reach.</span>
-<span class="sd">        The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;navigatetocharge_prevstate_in&#39; (as far as the input value is concerned) and &#39;navigatetocharge_prevstate_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the previous state identifier.</span>
+<span class="sd">        |  The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;target_reached&#39;.</span>
+<span class="sd">        |  The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;navigatetocharge_targetloc_in&#39; (as far as the input value is concerned) and &#39;navigatetocharge_targetloc_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the location the robot should reach.</span>
+<span class="sd">        |  The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;navigatetocharge_prevstate_in&#39; (as far as the input value is concerned) and &#39;navigatetocharge_prevstate_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the previous state identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -915,12 +915,13 @@
 
         <span class="sd">&quot;&quot;&quot;Function that is called every time that this state is executed.</span>
 
-<span class="sd">        If the previous state was not &#39;NavigatetoCharge&#39;, possible control goals are cancelled and a request to the &#39;planner&#39; server, containing the charging room, is sent. The server generates and returns a series of via-point towards the location at issue. </span>
-<span class="sd">        This list is passed on in form of a request to the &#39;controller&#39; server which guides the robot along such path. During the accomplishment of this task the global variable &#39;transition&#39; is continuously checked.</span>
-<span class="sd">        If, by the time the &#39;controller&#39; server finished performing the task, the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;target_reached&#39;.</span>
-<span class="sd">        At the beginning of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
-<span class="sd">        At the end of the function instead, once the &#39;controller&#39; server returned succesfully, the &#39;update_robot_location&#39; and &#39;update_robot_stamp&#39; methods are executed so as to update both the robot timestamp related to the last time it moved and its location.</span>
-<span class="sd">        Finally the global variable &#39;transition&#39; is returned.</span>
+<span class="sd">        |  If the previous state was not &#39;NavigatetoCharge&#39;, possible control goals are cancelled. Then, if the robot is not already in the charging room, a request to the &#39;planner&#39; server, containing the charging room, is sent. </span>
+<span class="sd">        |  The server generates and returns a series of via-points towards the location at issue. This list is passed on in form of a request to the &#39;controller&#39; server which guides the robot along such path. </span>
+<span class="sd">        |  During the accomplishment of this task the global variable &#39;transition&#39; is continuously checked. If, by the time the &#39;controller&#39; server finished performing the task, the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;target_reached&#39;.</span>
+<span class="sd">        |  If it is the case that the robot is already in the charging room, the planning and controlling are not performed and simply the global variable is updated to &#39;target_reached&#39;.</span>
+<span class="sd">        |  At the beginning of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
+<span class="sd">        |  At the end of the function instead, either once the &#39;controller&#39; server returned succesfully or once the process detects that the robot is already in the charging room, the &#39;update_robot_location&#39; and &#39;update_robot_stamp&#39; methods are executed so as to update both the robot timestamp related to the last time it moved and its location.</span>
+<span class="sd">        |  Finally the global variable &#39;transition&#39; is returned.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -956,20 +957,35 @@
             <span class="c1"># Update the visitedAt property of the location that the robot is leaving</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[92m&#39;</span> <span class="o">+</span> <span class="s2">&quot;Updating the visitedAt timestamp of the location to the instant the robot starts leaving it...&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">update_room_stamp</span><span class="p">()</span>
+            <span class="n">current_location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_room_stamp</span><span class="p">()</span>
 
             <span class="c1"># --------------------</span>
 
-            <span class="c1"># Make a request to the planning server</span>
-            <span class="n">via_points_list</span> <span class="o">=</span> <span class="n">plan</span><span class="p">(</span><span class="s1">&#39;E0&#39;</span><span class="p">)</span> <span class="c1"># this function is atomic: can&#39;t be interrupted by a battery_low signal</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">current_location</span> <span class="o">!=</span> <span class="s1">&#39;E0&#39;</span><span class="p">):</span>
 
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The path to location E0 has been generated...&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">via_points_list</span><span class="p">)</span>
+                <span class="c1"># Make a request to the planning server</span>
+                <span class="n">via_points_list</span> <span class="o">=</span> <span class="n">plan</span><span class="p">(</span><span class="s1">&#39;E0&#39;</span><span class="p">)</span> <span class="c1"># this function is atomic: can&#39;t be interrupted by a battery_low signal</span>
 
-            <span class="c1"># --------------------</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The path to location E0 has been generated...&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">via_points_list</span><span class="p">)</span>
 
-            <span class="c1"># Make a request to the controlling server</span>
-            <span class="n">control</span><span class="p">(</span><span class="n">via_points_list</span><span class="p">)</span>
+                <span class="c1"># --------------------</span>
+
+                <span class="c1"># Make a request to the controlling server</span>
+                <span class="n">control</span><span class="p">(</span><span class="n">via_points_list</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Already in location E0&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Update the now property of the robot (timestamp of the last time that the robot moved)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_robot_stamp</span><span class="p">()</span>
+
+                <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># print(&#39;\033[93m&#39; + &quot;\nstate NavigatetoCharge got the mutex (2)&quot; + &#39;\033[0m&#39;) # DEBUG</span>
+                    <span class="n">transition</span> <span class="o">=</span> <span class="s1">&#39;target_reached&#39;</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
 
         <span class="c1"># Wait for the end of the controlling task unless a new transition arrives</span>
         <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
@@ -987,7 +1003,7 @@
 
                 <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="c1"># print(&#39;\033[93m&#39; + &quot;\nstate NavigatetoCharge got the mutex (2)&quot; + &#39;\033[0m&#39;) # DEBUG</span>
+                    <span class="c1"># print(&#39;\033[93m&#39; + &quot;\nstate NavigatetoCharge got the mutex (3)&quot; + &#39;\033[0m&#39;) # DEBUG</span>
                     <span class="n">transition</span> <span class="o">=</span> <span class="s1">&#39;target_reached&#39;</span>
                 <span class="k">finally</span><span class="p">:</span>
                     <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
@@ -1009,11 +1025,11 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;waited_enough&#39;.</span>
-<span class="sd">        The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;wait_targetloc_in&#39; (as far as the input value is concerned) and &#39;wait_targetloc_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the location the robot should reach.</span>
-<span class="sd">        The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;wait_prevstate_in&#39; (as far as the input value is concerned) and &#39;wait_prevstate_out&#39; (as far as the output value is concerned).</span>
-<span class="sd">        It contains the previous state identifier.</span>
+<span class="sd">        |  The possible outcomes of the implemented state are the strings &#39;battery_low&#39; and &#39;waited_enough&#39;.</span>
+<span class="sd">        |  The variable &#39;sm_targetloc&#39; shared among the states here is referred as: &#39;wait_targetloc_in&#39; (as far as the input value is concerned) and &#39;wait_targetloc_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the location the robot should reach.</span>
+<span class="sd">        |  The variable &#39;sm_prevstate&#39; shared among the states here is referred as: &#39;wait_prevstate_in&#39; (as far as the input value is concerned) and &#39;wait_prevstate_out&#39; (as far as the output value is concerned).</span>
+<span class="sd">        |  It contains the previous state identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1043,10 +1059,10 @@
 
         <span class="sd">&quot;&quot;&quot;Function that is called every time that this state is executed.</span>
 
-<span class="sd">        The function simply makes the process sleep for the desired &#39;exploring&#39; time (5 s by default). However, during this period of time, the global variable &#39;tansition&#39; is checked 10 times in order to detect possible &#39;battery_low&#39; signals that have been issued.</span>
-<span class="sd">        After the total amount of time, if the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;waited_enough&#39;.</span>
-<span class="sd">        At the end of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
-<span class="sd">        Finally the global variable &#39;transition&#39; is returned.</span>
+<span class="sd">        |  The function simply makes the process sleep for the desired &#39;exploring&#39; time (5 s by default). However, during this period of time, the global variable &#39;tansition&#39; is checked 10 times in order to detect possible &#39;battery_low&#39; signals that have been issued.</span>
+<span class="sd">        |  After the total amount of time, if the value of the global variable &#39;transition&#39; has not changed into &#39;battery low&#39;, it is assigned with the string &#39;waited_enough&#39;.</span>
+<span class="sd">        |  At the end of the fuction, the &#39;update_room_stamp&#39; method belonging to the imported class named &#39;EnvironmentOntology&#39; is executed so as to update the timestamp that takes into account the last time a location was visited.</span>
+<span class="sd">        |  Finally the global variable &#39;transition&#39; is returned.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -1072,6 +1088,9 @@
             <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
 
         <span class="c1"># --------------------</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">userdata</span><span class="o">.</span><span class="n">wait_prevstate_in</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">):</span> <span class="c1"># if the previous state was not this one (&#39;Wait&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loop_count</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># restart the loop counter</span>
         
         <span class="c1"># Wait some time (5 seconds by default) if the transition global variable remains &#39;no_transition&#39;</span>
         <span class="c1"># This procedure of waiting is implemented to be NOT atomic, since hypothetically the robot doesn&#39;t just wait, but explores the room, so it can</span>
