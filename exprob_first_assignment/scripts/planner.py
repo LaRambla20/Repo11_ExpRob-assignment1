@@ -48,8 +48,8 @@ class PlaningAction(object):
 
         """ (constructor) Function that is called whenever an instance of this class is defined.
 
-        First, some parameters, needed for determining the functioning of the dummy planning algorithm, are retrieved from the parameter server. 
-        Then, the actions server that answers to requests belonging to the 'motion/planner' action service and assigns the 'execute_callback' function to it.
+        |  First, some parameters, needed for determining the functioning of the dummy planning algorithm, are retrieved from the parameter server. 
+        |  Then, the actions server that answers to requests belonging to the 'motion/planner' action service and assigns the 'execute_callback' function to it.
         
         Args:
             self: variable that refers to the class instance
@@ -85,10 +85,10 @@ class PlaningAction(object):
 
         """ Function that is called every time that a client goal-request related to the 'motion/planner' action service is received.
 
-        This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the 'robot-state' node), while the last 
-        point is the 'goal' position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range. 
-        To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.
-        The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner. 
+        |  This function will return a list of random points (i.e., the path), where the first point is the current robot position (retrieved from the 'robot-state' node), while the last 
+        |  point is the 'goal' position (randomly determined since it is a dummy implementation). The path will contain a random number of other points, which spans in a predefined range. 
+        |  To simulate computation, each point is added to the plan with a random delay spanning in a predefined range as well.
+        |  The request message contains the name of the supposed target location, which here is simply printed on the screen, but will be needed in a proper implementation of the planner. 
 
         Args:
             self: variable that refers to the class instance

@@ -7,8 +7,8 @@
 
 .. moduleauthor:: Emanuele Rambaldi <emanuele.rambaldi3@studio.unibo.it>
 
-Given a path as a set of via-points, via a client request, the node at issue simulates the movements to reach each point with a random delay. 
-Furthermore the node updates the current robot position stored in the 'robot-states' node every time that a via-point has supposedly been reached.
+|  Given a path as a set of via-points, via a client request, the node at issue simulates the movements to reach each point with a random delay. 
+|  Furthermore the node updates the current robot position stored in the 'robot-states' node every time that a via-point has supposedly been reached.
 
 Client:
     - /state/set_pose
@@ -49,8 +49,8 @@ class ControllingAction(object):
 
         """ (constructor) Function that is called whenever an instance of this class is defined.
 
-        First, a parameter, needed for determining the functioning of the dummy control algorithm, is retrieved from the parameter server. 
-        Then, the actions server that answers to requests belonging to the 'motion/controller' action service and assigns the 'execute_callback' function to it.
+        |  First, a parameter, needed for determining the functioning of the dummy control algorithm, is retrieved from the parameter server. 
+        |  Then, the actions server that answers to requests belonging to the 'motion/controller' action service and assigns the 'execute_callback' function to it.
         
         Args:
             self: variable that refers to the class instance
@@ -81,8 +81,8 @@ class ControllingAction(object):
 
         """ Function that is called every time that a client goal-request related to the 'motion/controller' action service is received.
 
-        This function requires a list of via points (i.e., the path), and it simulates a movement through each point with a delay spanning in a predefined range.
-        As soon as each via point is reached, the related robot position is updated in the 'robot-state' node.
+        |  This function requires a list of via points (i.e., the path), and it simulates a movement through each point with a delay spanning in a predefined range.
+        |  As soon as each via point is reached, the related robot position is updated in the 'robot-state' node.
 
         Args:
             self: variable that refers to the class instance

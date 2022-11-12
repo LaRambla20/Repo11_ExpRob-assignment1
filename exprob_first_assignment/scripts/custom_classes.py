@@ -110,11 +110,11 @@ class EnvironmentOntology():
 
         """Function that is called in order to construct the desired ontology.
 
-        First, the plain ontology (ontology without the Abox) is loaded. Then, based on the arguments that have been passed to the function, some manipulations of the ontology are performed.
-        In particular for each location the doors are specified and all the defined individuals are made disjointed between each other.
-        In addition to that, the robot is positioned in the charging room and the timestamp of the last time a location has been visited is initialised for each location.
-        Finally, the reasoner is instructed to reason about the changes that were made and the constructed ontology (ontology with the Abox) is saved with the name passed as argument.
-        Note that all these actions are performed by interacting with the ontology via the ARMOR server.
+        |  First, the plain ontology (ontology without the Abox) is loaded. Then, based on the arguments that have been passed to the function, some manipulations of the ontology are performed.
+        |  In particular for each location the doors are specified and all the defined individuals are made disjointed between each other.
+        |  In addition to that, the robot is positioned in the charging room and the timestamp of the last time a location has been visited is initialised for each location.
+        |  Finally, the reasoner is instructed to reason about the changes that were made and the constructed ontology (ontology with the Abox) is saved with the name passed as argument.
+        |  Note that all these actions are performed by interacting with the ontology via the ARMOR server.
 
         Args:
             self: variable that refers to the class instance
@@ -225,9 +225,9 @@ class EnvironmentOntology():
 
         """Function that is called in order to determine the location that the robot should reach next.
 
-        First, the ontology is queried so as to retrieve the locations that the robot can reach. Then, the labels associated to reachable locations are checked in order to detect urgent locations and corridors. 
-        If no urgent location has been detected, then a corridor, randomly chosen among the reachable locations, is returned. Otherwise an urgent location, randomly chosen among the reachable locations, is returned.
-        Note that all these actions are performed by interacting with the ontology via the ARMOR server.
+        |  First, the ontology is queried so as to retrieve the locations that the robot can reach. Then, the labels associated to reachable locations are checked in order to detect urgent locations and corridors. 
+        |  If no urgent location has been detected, then a corridor, randomly chosen among the reachable locations, is returned. Otherwise an urgent location, randomly chosen among the reachable locations, is returned.
+        |  Note that all these actions are performed by interacting with the ontology via the ARMOR server.
 
         Args:
             self: variable that refers to the class instance
@@ -279,10 +279,10 @@ class EnvironmentOntology():
 
         """Function that is called in order to update the timestamp that takes into account the last time a location was visited.
 
-        First, the ontology is queried in order to retrieve both the location that the robot is in and the timestamp of the last time the robot visited such location. 
-        Then, the just-retrieved timestamp is replaced with the current time. Finally, the reasoner is instructed to reason about the changes that were made.
-        Note that all these actions are performed by interacting with the ontology via the ARMOR server.
-        The function returns the current robot location that it retrieved from the ontology.
+        |  First, the ontology is queried in order to retrieve both the location that the robot is in and the timestamp of the last time the robot visited such location. 
+        |  Then, the just-retrieved timestamp is replaced with the current time. Finally, the reasoner is instructed to reason about the changes that were made.
+        |  Note that all these actions are performed by interacting with the ontology via the ARMOR server.
+        |  The function returns the current robot location that it retrieved from the ontology.
 
         Args:
             self: variable that refers to the class instance
@@ -328,9 +328,9 @@ class EnvironmentOntology():
 
         """Function that is called in order to update the timestamp that takes into account the last time the robot moved.
 
-        First, the ontology is queried in order to retrieve the timestamp of the last time the robot moved. Then, the just-retrieved timestamp is replaced with the current time. 
-        Finally, the reasoner is instructed to reason about the changes that were made.
-        Note that all these actions are performed by interacting with the ontology via the ARMOR server.
+        |  First, the ontology is queried in order to retrieve the timestamp of the last time the robot moved. Then, the just-retrieved timestamp is replaced with the current time. 
+        |  Finally, the reasoner is instructed to reason about the changes that were made.
+        |  Note that all these actions are performed by interacting with the ontology via the ARMOR server.
 
         Args:
             self: variable that refers to the class instance
@@ -365,9 +365,9 @@ class EnvironmentOntology():
 
         """Function that is called in order to update where the robot is.
 
-        First, the ontology is queried in order to retrieve the location that the robot is in. Then, the just-retrieved location is replaced with the location passed as argument. 
-        Finally, the reasoner is instructed to reason about the changes that were made.
-        Note that all these actions are performed by interacting with the ontology via the ARMOR server.
+        |  First, the ontology is queried in order to retrieve the location that the robot is in. Then, the just-retrieved location is replaced with the location passed as argument. 
+        |  Finally, the reasoner is instructed to reason about the changes that were made.
+        |  Note that all these actions are performed by interacting with the ontology via the ARMOR server.
 
         Args:
             self: variable that refers to the class instance

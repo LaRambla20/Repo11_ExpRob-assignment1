@@ -112,8 +112,8 @@
 
         <span class="sd">&quot;&quot;&quot; (constructor) Function that is called whenever an instance of this class is defined.</span>
 
-<span class="sd">        The function initalises the robot position and battery level and starts a parallel thread to run the method that manages the battery.</span>
-<span class="sd">        This management is carried out either manually or under request, based on the value of a parameter, here retrieved from the parameter server and stored in th &#39;_randomness&#39; variable.</span>
+<span class="sd">        |  The function initalises the robot position and battery level and starts a parallel thread to run the method that manages the battery.</span>
+<span class="sd">        |  This management is carried out either manually or under request, based on the value of a parameter, here retrieved from the parameter server and stored in th &#39;_randomness&#39; variable.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            self: variable that refers to the class instance</span>
@@ -129,7 +129,7 @@
         <span class="c1"># Initialise randomness, if enabled.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_randomness</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_RANDOM_ACTIVE</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomness</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_BATTERY_TIME</span><span class="p">,</span> <span class="p">[</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">PARAM_BATTERY_TIME</span><span class="p">,</span> <span class="p">[</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">])</span>
             <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Random-based battery low notification active: the battery gets low with a &#39;</span> \
                       <span class="s1">&#39;delay in the range of [</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">) seconds.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_battery_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="n">anm</span><span class="o">.</span><span class="n">tag_log</span><span class="p">(</span><span class="n">log_msg</span><span class="p">,</span> <span class="n">LOG_TAG</span><span class="p">))</span>
@@ -249,7 +249,7 @@
             <span class="c1"># Publish battery level (low).</span>
             <span class="n">publisher</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_battery_low</span><span class="p">))</span>
             <span class="c1"># Log state.</span>
-            <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;Robot got low battery after </span><span class="si">%f</span><span class="s1"> seconds.&#39;</span> <span class="o">%</span> <span class="n">delay</span>
+            <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[91m&#39;</span> <span class="o">+</span> <span class="s1">&#39;Robot got low battery after </span><span class="si">%f</span><span class="s1"> seconds.&#39;</span> <span class="o">%</span> <span class="n">delay</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_print_info</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
 
 
@@ -312,7 +312,6 @@
     <span class="c1"># Instantiate the node manager class and wait.</span>
     <span class="n">RobotState</span><span class="p">()</span>
     <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
-
 </pre></div>
 
            </div>

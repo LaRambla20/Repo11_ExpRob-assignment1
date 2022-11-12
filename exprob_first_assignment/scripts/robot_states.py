@@ -48,8 +48,8 @@ class RobotState:
 
         """ (constructor) Function that is called whenever an instance of this class is defined.
 
-        The function initalises the robot position and battery level and starts a parallel thread to run the method that manages the battery.
-        This management is carried out either manually or under request, based on the value of a parameter, here retrieved from the parameter server and stored in th '_randomness' variable.
+        |  The function initalises the robot position and battery level and starts a parallel thread to run the method that manages the battery.
+        |  This management is carried out either manually or under request, based on the value of a parameter, here retrieved from the parameter server and stored in th '_randomness' variable.
 
         Args:
             self: variable that refers to the class instance
@@ -248,4 +248,3 @@ if __name__ == "__main__":
     # Instantiate the node manager class and wait.
     RobotState()
     rospy.spin()
-
