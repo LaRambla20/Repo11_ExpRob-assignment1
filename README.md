@@ -98,7 +98,7 @@ For this test the architecture is launched in random mode (`test/random_sense/ac
 Initially, the robot is exploring (`Wait` state) the corridor `C2`. Once the exploration time (`state_machine/explore_time = 5.0`) has expired, the ontology is queried in order to retrieve the locations that the robot can reach and to check if there is some urgent location among them. In this case, room `R4` is identified as urgent and therefore set as target location. Right after updating the time-stamp of the departure location (`C2`), a 'dummy' plan towards `R4` is generated and the robot is guided along it. Once the target location has been reached, the robot location and time-stamp are updated and the state machine transitions again to the `Wait` state. However, while simulating the exploration of `R4`, the battery gets low. As a consequence, the navigation towards the charging room `E0` is simulated. Finally, the robot waits some time (`state_machine/charge_time = 5.0`) in the charging room for letting the battery recharge and then the state machine transitions back to the reason state, which sets the corridor `C1` as target.
 
 ## Working hypothesis and environment
-For simplicity reasons, during the implementation of the system, some hypothesis were made. These naturally led to some limitations of the described architecture. However the system smoothly carries out the required task and has been developed in order to be easily adapted to more complex scenarios.
+For simplicity reasons, during the implementation of the system, some hypotheses were made. These naturally led to some limitations of the described architecture. However the system smoothly carries out the required task and has been developed in order to be easily adapted to more complex scenarios.
 ### System's features
 Hereafter a list of the main system's features is presented:
 * GUI to let the user decide how the environment surveilled by the robot should look like
@@ -111,7 +111,32 @@ Hereafter a list of the main system's features is presented:
 * presence of a node (`robot_states`) that keeps track of the robot state (position and battery level)
 * realistic 'dummy' algorithms for planning and controlling the robot (simulating the necessary time for performing the corresponding operations)
 
+### System's hypotheses
+Hereafter a list of the main system's hypotheses, both for the environment and for the functioning of the architecture, is presented:
+* Environment
+  * The environment is 2D
+  * No obtsacles are considered
+  * A location can only have 1 door shared with another location
+  * Rooms have only 1 door (and therefore are connected to only 1 location), corridors have at least two doors (and therefore are connected to at least 2 locations)
+  * The charging room `E0` exists by default and the robot is initially in there
+  * The charging room `E0` is by default connected to all the corridors (to allow the robot to reach it as fast as possible)
+  * The minimum number of rooms (in addition to the charging room) is 1, the maximum number is 10
+  * Rooms can be directly connected to the charging room `E0` (specifically, the rooms connected to the charging room are all the remaining rooms that are not connected to any corridor)
+  * The minimum number of corridors (in addition to the charging room) is 0, the maximum number is 5
+
+* Functioning
+  * the `planner` node is 'dummy': it doesn't generates the actual path towards the desired location; it just evaluates a random path to a random point in the environment
+  * the `controller` node is 'dummy': it doesn't guide the robot along the generated path; it just implements a delay between the different via-points of the path
+  * the battery management mechanism is 'dummy': the `robot_states` node doesn't generate a `battery_low` signal based on the battery level; it just generates them either randomly or under user request
+  * the `Wait` state of the `state_machine` node is dummy: while the robot should explore the room for a certain amount of time, in the implementation it just stays still and waits some time
+  * the `Charge` state of the `state_machine` node is dummy: while the robot should recharge its battery by increasing its battery level, in the implementation it just stays waits some time
+  * the `urgent_check()` function called in the `Reason` state of the `state_machine` node is considered to be 'atomic'. In other words it cannot be interrupted if a `battery_low` transition is issued. This is because reasonably the 'reasoning process'  of the robot should not be interrupted and, furthermore, it is unlikely that the battery runs out during a purely computational task. Anyway, if a `battery_low` signal is sent, the transition is stored and, if no more transitions are issued, after the function finishes executing, it is taken into account
+  * the `plan()` function has been implemented as the `urgent_check()` function
+  * 
+
 ### System's limitations
+Hereafter a list of the main system's limitations is presented:
+* 
 ### Possible improvements
 
 ## Author
