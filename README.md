@@ -136,7 +136,7 @@ Hereafter a list of the main system's hypotheses, both for the environment and f
   * both the robot location and the time-stamp that takes into account the last time the robot moved is updated either at the end of the `Navigate` state or at the end of the `NavigatetoCharge` state  (that is when the robot actually reaches the location)
 
 ### System's limitations
-Most of the limitations derive from the hypotheses that were made for the implementation of the system. In particular, environments that don't meet the previously seen requirements cannot be generated and the 'dummy' mechanisms
+Most of the limitations derive from the hypotheses that were made for the implementation of the system. In particular, environments that don't meet the previously seen requirements cannot be generated and the 'dummy' mechanisms semplify , making it unrealistic.
 ### Possible improvements
 
 ## Author
