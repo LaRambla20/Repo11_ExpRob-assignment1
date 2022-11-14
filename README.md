@@ -24,7 +24,7 @@ As the image suggests, without considering the `aRMOR server`, the architecture 
 Hereafter the sequence diagram of the software architecture, which highlights the timing of the communication between the nodes, is shown. In particular, it displays the communication and computation flow, starting from the moment the architecture is launched, if no `battery_low` signal is issued. This message, sent out by the `robot_states` node either randomly or under user request, is perceived by the `state_machine` node, which makes the recharge mechanism start. The recharge mechanism is very similar to the one that the sequence diagram describes right after the construction of the environment. The only substantial difference is that, if the robot is already in the charging room, the portion of the diagram about generating a plan and controlling the robot is skipped.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/91536387/201623264-3092871d-c534-4ac8-ace4-ce6e60a13a43.png" />
+  <img src="https://user-images.githubusercontent.com/91536387/201776436-189ee3e5-d6f3-43f2-8da3-343f96842e84.png" />
 </p>
 
 As it can be seen from the picture, first the `state_machine` node sets the initial pose, by sending a request to the `robot_states` node. Then it builds the environment based on the user instruction. After that, it checks the locations that the robot can reach and retrieves a target location among them. Before simulating the navigation towards the location at issue, the `state_machine` node updates the time-stamp of the location that the robot is leaving. All these operations are carried out by invoking the `aRMOR server`, which, in its turn, handles the interaction with the ontology. Right after the update, a request to the `planner` node is issued. This node asks the `robot_states` node for the current postion of the robot and returns a randmo path towards the target location to the `state_machine` node. The latter sends a request containing the generated plan to the `controller` node, which simulates controlling the robot along such path. Everytime that a via-point of the plan is reached, the `controller` node updates the robot position, by communicating with the `robot_states` node. Once the target location has been fictitiously reached, the control is passed again to the `state_machine` node, which updates the robot location and time-stamp. Then the exploration of the reached location is simulated and, after that, its time-stamp is updated.  
@@ -136,8 +136,10 @@ Hereafter a list of the main system's hypotheses, both for the environment and f
   * both the robot location and the time-stamp that takes into account the last time the robot moved is updated either at the end of the `Navigate` state or at the end of the `NavigatetoCharge` state  (that is when the robot actually reaches the location)
 
 ### System's limitations
-Most of the limitations derive from the hypotheses that were made for the implementation of the system. In particular, environments that don't meet the previously seen requirements cannot be generated and the 'dummy' mechanisms semplify , making it unrealistic.
+Most of the limitations derive from the hypotheses that were made for the implementation of the system. In particular, environments that don't meet the aforementioned requirements cannot be generated, just as the previously described 'dummy' mechanisms make the system simpler, but necessarily less realistic. Other limitations that stem from the system's hyptheses are: the architecure works only with know-a-priori environments and the robot can only detect urgent locations that are adjacent to the location that it is in.
+
 ### Possible improvements
+Some of the possible improvements simply consist in solving the system's limitations. For example, all the 'dummy' mechanisms could be substitued with realistic algorithms. Specifically, the `planner` node could embed a proper planning algorithm that evaluates a reasonable path towards the target location, by also taking into account walls and obstacles. 
 
 ## Author
 Emanuele Rambaldi  
