@@ -132,7 +132,8 @@ Hereafter a list of the main system's hypotheses, both for the environment and f
   * the `Charge` state of the `state_machine` node is dummy: while the robot should recharge its battery by increasing its battery level, in the implementation it just stays waits some time
   * the `urgent_check()` function called in the `Reason` state of the `state_machine` node is considered to be 'atomic'. In other words it cannot be interrupted if a `battery_low` transition is issued. This is because reasonably the 'reasoning process'  of the robot should not be interrupted and, furthermore, it is unlikely that the battery runs out during a purely computational task. Anyway, if a `battery_low` signal is sent, the transition is stored and, if no more transitions are issued, after the function finishes executing, it is taken into account
   * the `plan()` function has been implemented as the `urgent_check()` function
-  * 
+  * the time-stamp  that takes into account the last time a certain location was visited is updated both when either the `Wait` state or the `Charge` state of the `state_machine` node si exited (that is after the robot either finishes exploring the location it reached or finishes recharging), and when either the `Navigate` state or the `NavigatetoCharge` state is entered (that is when the robot starts leaving the location)
+  * both the robot location and the time-stamp that takes into account the last time the robot moved is updated either at the end of the `Navigate` state or at the end of the `NavigatetoCharge` state  (that is when the robot actually reaches the location)
 
 ### System's limitations
 Hereafter a list of the main system's limitations is presented:
