@@ -27,7 +27,7 @@ Hereafter the sequence diagram of the software architecture, which highlights th
   <img src="https://user-images.githubusercontent.com/91536387/201623264-3092871d-c534-4ac8-ace4-ce6e60a13a43.png" />
 </p>
 
-As it can be seen from the picture, first the `state_machine` node sets the initial pose, by sending a request to the `robot_states` node. Then it builds the environment based on the user instruction. After that, it checks the locations that the robot can reach and retrieves a target location among them. Before simulating the navigation towards the location at issue, the `state_machine` node updates the time-stamp of the location that the robot is leaving. All these operations are carried out by invoking the `aRMOR server`, which, in its turn, handles the interaction with the ontology. Right after the update, a request to the `planner` node is issued. This node asks the `robot_states` node for the current postion of the robot and returns a randmo path towards the target location to the `state_machine` node. The latter sends a request containing the generated plan to the `controller` node, which simulates controlling the robot along such path. Everytime that a via-point of the plan is reached, the `controller` node updates the robot position, by communicating with the `robot_states` node. Once the target location has been fictitiously reached, the control is passed again to the `state_machine` node, which updates the robot time-stamp. Then the exploration of the reached location is simulated and, after that, its time-stamp is updated.  
+As it can be seen from the picture, first the `state_machine` node sets the initial pose, by sending a request to the `robot_states` node. Then it builds the environment based on the user instruction. After that, it checks the locations that the robot can reach and retrieves a target location among them. Before simulating the navigation towards the location at issue, the `state_machine` node updates the time-stamp of the location that the robot is leaving. All these operations are carried out by invoking the `aRMOR server`, which, in its turn, handles the interaction with the ontology. Right after the update, a request to the `planner` node is issued. This node asks the `robot_states` node for the current postion of the robot and returns a randmo path towards the target location to the `state_machine` node. The latter sends a request containing the generated plan to the `controller` node, which simulates controlling the robot along such path. Everytime that a via-point of the plan is reached, the `controller` node updates the robot position, by communicating with the `robot_states` node. Once the target location has been fictitiously reached, the control is passed again to the `state_machine` node, which updates the robot location and time-stamp. Then the exploration of the reached location is simulated and, after that, its time-stamp is updated.  
 
 Hereafter the state diagram of the software architecture, which highlights the logic of the robot behaviour, is shown:
 
@@ -82,7 +82,7 @@ rosrun armor execute it.emarolab.armor.ARMORMainService
 ```bash
 roslaunch exprob_first_assignment software_architecture.launch ontology_path:="path-to-the-plain-ontology-folder" ontology_name:="name-of-the-constructed-ontology"
 ```
-* two new terminal windows will be opened: one that corresponds to the `state_machine` node and initially contains the GUI that guides you through the construction of the environment; the other that corresponds to the `robot_states` node and mainly displays the robot battery management
+* two new terminal windows will be opened: one that corresponds to the `state_machine` node and initially contains the GUI that guides you through the construction of the environment; the other that corresponds to the `robot_states` node and mainly displays the robot's battery management
 
 ## Functioning 
 The following video briefly shows the functioning of the software architecture:
@@ -97,6 +97,22 @@ For this test the architecture is launched in random mode (`test/random_sense/ac
 
 Initially, the robot is exploring (`Wait` state) the corridor `C2`. Once the exploration time (`state_machine/explore_time = 5.0`) has expired, the ontology is queried in order to retrieve the locations that the robot can reach and to check if there is some urgent location among them. In this case, room `R4` is identified as urgent and therefore set as target location. Right after updating the time-stamp of the departure location (`C2`), a 'dummy' plan towards `R4` is generated and the robot is guided along it. Once the target location has been reached, the robot location and time-stamp are updated and the state machine transitions again to the `Wait` state. However, while simulating the exploration of `R4`, the battery gets low. As a consequence, the navigation towards the charging room `E0` is simulated. Finally, the robot waits some time (`state_machine/charge_time = 5.0`) in the charging room for letting the battery recharge and then the state machine transitions back to the reason state, which sets the corridor `C1` as target.
 
+## Working hypothesis and environment
+For simplicity reasons, during the implementation of the system, some hypothesis were made. These naturally led to some limitations of the described architecture. However the system smoothly carries out the required task and has been developed in order to be easily adapted to more complex scenarios.
+### System's features
+Hereafter a list of the main system's features is presented:
+* GUI to let the user decide how the environment surveilled by the robot should look like
+* compatibility with both a random and a manual modality for the battery management
+* prompt reply to `battery_low` signals in order to recharge the robot's battery as soon as possible
+* possibilty of setting some parameters saved in the ROS parameter server for a tailored functioning of the system
+* possibilty of passing the ontology folder path and the constructed ontology name as arguments to the launch file
+* safe access to the global variable that contains the next transition of the state machine by using a mutex
+* definition of a custom class to manage the ontology and interact with it
+* presence of a node (`robot_states`) that keeps track of the robot state (position and battery level)
+* realistic 'dummy' algorithms for planning and controlling the robot (simulating the necessary time for performing the corresponding operations)
+
+### System's limitations
+### Possible improvements
 
 ## Author
 Emanuele Rambaldi  
