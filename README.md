@@ -23,7 +23,9 @@ As the image suggests, without considering the `aRMOR server`, the architecture 
 
 Hereafter the sequence diagram of the software architecture, which highlights the timing of the communication between the nodes, is shown. In particular, it displays the communication and computation flow, starting from the moment the architecture is launched, if no `battery_low` signal is issued. This message, sent out by the `robot_states` node either randomly or under user request, is perceived by the `state_machine` node, which makes the recharge mechanism start. The recharge mechanism is very similar to the one that the sequence diagram describes right after the construction of the environment. The only substantial difference is that, if the robot is already in the charging room, the portion of the diagram about generating a plan and controlling the robot is skipped.
 
-![sequence_diagram](https://user-images.githubusercontent.com/91536387/201623264-3092871d-c534-4ac8-ace4-ce6e60a13a43.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/91536387/201623264-3092871d-c534-4ac8-ace4-ce6e60a13a43.png" />
+</p>
 
 As it can be seen from the picture, first the `state_machine` node sets the initial pose, by sending a request to the `robot_states` node. Then it builds the environment based on the user instruction. After that, it checks the locations that the robot can reach and retrieves a target location among them. Before simulating the navigation towards the location at issue, the `state_machine` node updates the time-stamp of the location that the robot is leaving. All these operations are carried out by invoking the `aRMOR server`, which, in its turn, handles the interaction with the ontology. Right after the update, a request to the `planner` node is issued. This node asks the `robot_states` node for the current postion of the robot and returns a randmo path towards the target location to the `state_machine` node. The latter sends a request containing the generated plan to the `controller` node, which simulates controlling the robot along such path. Everytime that a via-point of the plan is reached, the `controller` node updates the robot position, by communicating with the `robot_states` node. Once the target location has been fictitiously reached, the control is passed again to the `state_machine` node, which updates the robot time-stamp. Then the exploration of the reached location is simulated and, after that, its time-stamp is updated.  
 
@@ -31,7 +33,7 @@ Hereafter the state diagram of the software architecture, which highlights the l
 
 ![state_diagram](https://user-images.githubusercontent.com/91536387/201629269-72ffc92d-d75f-4677-a153-fe67564109b4.png)
 
-As the picture suggestes, the logic of the architecture is implemented through a state machine composed of 6 states:
+As the picture suggests, the logic of the architecture is implemented through a state machine composed of 6 states:
 * `BuildEnvironment`: state in which, first, the features of the desired environment are asked to the user; then, the plain ontology is loaded, manipulated so as to obtain the requested environment and saved
 * `Reason`: state in which the process asks the ontology information about the locations that the robot can reach and based on that it decides where the robot should go next
 * `Navigate`: state in which a plan to the target location is generated and in which the robot is guided along such path until it reaches the location at issue 
@@ -61,8 +63,8 @@ Now, in order to launch the architecture:
   * `test/random_motion_time`: extrema of the range inside which the motion time is randomly extracted
   * `test/random_plan_points`: extrema of the range inside which the number of via-points is randomly extracted
   * `test/random_plan_time`: extrema of the range inside which the planning time is randomly extracted
-  * `test/random_sense/active`: boolean that determines the modality in which the battery_low signal is issued (either manual or random)
-  * `test/random_sense/battery_time`: extrema of the range inside which the time in which the battery gets low is randomly extracted
+  * `test/random_sense/active`: boolean that determines the modality in which the `battery_low` signal is issued (either manual or random)
+  * `test/random_sense/battery_time`: extrema of the range inside which the time that the battery takes to get low is randomly extracted
   * `state_machine/explore_time`: time spent by the robot to explore the reached location
   * `state_machine/charge_time`: time spent by the robot to recharge its battery
 
@@ -81,6 +83,20 @@ rosrun armor execute it.emarolab.armor.ARMORMainService
 roslaunch exprob_first_assignment software_architecture.launch ontology_path:="path-to-the-plain-ontology-folder" ontology_name:="name-of-the-constructed-ontology"
 ```
 * two new terminal windows will be opened: one that corresponds to the `state_machine` node and initially contains the GUI that guides you through the construction of the environment; the other that corresponds to the `robot_states` node and mainly displays the robot battery management
+
+## Functioning 
+The following video briefly shows the functioning of the software architecture:
+
+https://user-images.githubusercontent.com/91536387/201639156-c0b78d76-74f5-47bd-a727-d0a0e3a512e1.mp4
+
+For this test the architecture is launched in random mode (`test/random_sense/active = True`), thus meaning that the `battery_low` signal is issued randomly after a certain time randomly extracted inside the range `test/random_sense/battery_time = [40.0 90.0]`. Furthermore the generated environment is the following:
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/91536387/201640893-99f420fb-e142-47fa-9b6e-304f64c0b558.png" width="350" />
+</p>
+
+Initially, the robot is exploring (`Wait` state) the corridor `C2`. Once the exploration time (`state_machine/explore_time = 5.0`) has expired, the ontology is queried in order to retrieve the locations that the robot can reach and to check if there is some urgent location among them. In this case, room `R4` is identified as urgent and therefore set as target location. Right after updating the time-stamp of the departure location (`C2`), a 'dummy' plan towards `R4` is generated and the robot is guided along it. Once the target location has been reached, the robot location and time-stamp are updated and the state machine transitions again to the `Wait` state. However, while simulating the exploration of `R4`, the battery gets low. As a consequence, the navigation towards the charging room `E0` is simulated. Finally, the robot waits some time (`state_machine/charge_time = 5.0`) in the charging room for letting the battery recharge and then the state machine transitions back to the reason state, which sets the corridor `C1` as target.
+
 
 ## Author
 Emanuele Rambaldi  
