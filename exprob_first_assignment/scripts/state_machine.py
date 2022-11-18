@@ -463,7 +463,7 @@ class BuildEnvironment(smach.State,EnvironmentOntology):
 
         # retrieve the desired ontology name passed as argument from command line
         args = rospy.myargv(argv = sys.argv)
-        if len(args) != 2: #check on the number of arguments -> one argument(the path to the file) is provided by the system by default -> so it is 1+2 in this case
+        if len(args) != 3: #check on the number of arguments -> one argument(the path to the file) is provided by the system by default -> so it is 1+2 in this case
             print('\033[91m' + "\ntoo many or not enough arguments provided" + '\033[0m' + " -> exiting")
             sys.exit(1)
 
