@@ -270,7 +270,7 @@ class EnvironmentOntology():
                     print("URGENT location detected -> setting " + inspected_location + " as target")
                     return(inspected_location)
 
-        print('\033[91m' +"NO " + '\033[0m' + "URGENT location  detected -> setting " + inspected_location + " as target")
+        print('\033[91m' +"NO " + '\033[0m' + "URGENT location  detected -> setting " + inspected_corridor + " as target")
         return(inspected_corridor) # if I exited both for loops it means that I didn't find any urgent room
 
     #----------------------------------------------------------------------------
