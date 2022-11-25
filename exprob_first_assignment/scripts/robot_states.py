@@ -73,7 +73,7 @@ class RobotState:
         rospy.Service(anm.SERVER_GET_POSE, GetPose, self.get_pose)
         rospy.Service(anm.SERVER_SET_POSE, SetPose, self.set_pose)
         # Start publisher on a separate thread.
-        th = threading.Thread(target=self._is_battery_low)
+        th = threading.Thread(target=self.is_battery_low)
         th.start()
         # Log information.
         log_msg = 'Initialise node `%s` with services `%s` and `%s`, and topic %s.' \
@@ -102,7 +102,7 @@ class RobotState:
             # Store the new current robot position.
             self._pose = request.pose
             # Log information.
-            self._print_info('Set current robot position through `%s` as (%f, %f)' \
+            self.print_info('Set current robot position through `%s` as (%f, %f)' \
                              % (anm.SERVER_SET_POSE, self._pose.x, self._pose.y))
         else:
             rospy.logerr(anm.tag_log('Cannot set an unspecified robot position', LOG_TAG))
@@ -133,14 +133,14 @@ class RobotState:
         else:
             log_msg = 'Get current robot position through `%s` as (%f, %f)' \
                       % (anm.SERVER_GET_POSE, self._pose.x, self._pose.y)
-            self._print_info(log_msg)
+            self.print_info(log_msg)
         # Create the response with the robot pose and return it.
         response = GetPoseResponse()
         response.pose = self._pose
         return response
 
     # Publish changes of battery levels. This method runs on a separate thread.
-    def _is_battery_low(self):
+    def is_battery_low(self):
 
         """ Function that is called in the class constructor and is run in a parallel thread.
 
@@ -155,18 +155,18 @@ class RobotState:
         publisher = rospy.Publisher(anm.TOPIC_BATTERY_LOW, Bool, queue_size=1, latch=True)
         if self._randomness:
             # Publish battery level changes randomly.
-            self._random_battery_notifier(publisher)
+            self.random_battery_notifier(publisher)
         else:
             # Publish battery level changes through a keyboard-based interface.
-            self._manual_battery_notifier(publisher)
+            self.manual_battery_notifier(publisher)
 
     # Publish when the battery change state (i.e. low) based on a random
     # delay within the interval [`self._random_battery_time[0]`, `self._random_battery_time[1]`).
     # The message is published through the `publisher` input parameter and is a
     # boolean value, i.e. `True`: battery low
-    def _random_battery_notifier(self, publisher):
+    def random_battery_notifier(self, publisher):
 
-        """ Function that is called by the '_is_battery_low()' method if the '_randomness' variable has value 'True'.
+        """ Function that is called by the 'is_battery_low()' method if the '_randomness' variable has value 'True'.
 
         It simply publishes 'battery_low' messages on the '/state/battery_low' topic with a delay that, at every iteration, is randomly chosen in a predefined interval.
 
@@ -186,15 +186,15 @@ class RobotState:
             publisher.publish(Bool(self._battery_low))
             # Log state.
             log_msg = '\033[91m' + 'Robot got low battery after %f seconds.' % delay + '\033[0m'
-            self._print_info(log_msg)
+            self.print_info(log_msg)
 
 
     # Allow keyboard interaction to emulate battery level changes.
     # The message is published through the `publisher` input parameter and is a
     # boolean value, i.e., `True`: battery low, `False`: battery high.
-    def _manual_battery_notifier(self, publisher):
+    def manual_battery_notifier(self, publisher):
 
-        """ Function that is called by the '_is_battery_low()' method if the '_randomness' variable has value 'False'.
+        """ Function that is called by the 'is_battery_low()' method if the '_randomness' variable has value 'False'.
 
         It simply prints a GUI on the screen and publishes 'battery_low' messages on the '/state/battery_low' topic whenever the user says so.
 
@@ -226,7 +226,7 @@ class RobotState:
 
     # Print logging only when random testing is active.
     # This is done to allow an intuitive usage of the keyboard-based interface.
-    def _print_info(self, msg):
+    def print_info(self, msg):
 
         """ Function with logging purposes that is called after a 'battery_low' message is issued when the 'battery-management' is random.
 

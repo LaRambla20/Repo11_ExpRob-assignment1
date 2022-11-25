@@ -48,6 +48,7 @@ from custom_classes import EnvironmentOntology # import the EnvironmentOntology 
 import numpy as np
 from http.client import USE_PROXY
 from threading import Lock
+import sys
 import roslib
 import rospy
 import smach
@@ -117,6 +118,9 @@ def clbk_battery(msg):
     global transition
 
     if (msg.data == True):
+
+        print('\033[91m' + "\n## The battery of the robot got low ##" + '\033[0m')
+
         mutex.acquire()
         try:
             # print('\033[93m' + "\nclbk_battery got the mutex" + '\033[0m') # DEBUG
@@ -138,14 +142,14 @@ def gui_function():
 
     while(1):
         while(1):
-            tot_n_rooms = input("How many rooms does the flat have? [max 10] ")
+            tot_n_rooms = input("How many rooms does the flat have? [max 9] ")
             try:
                 tot_n_rooms = int(tot_n_rooms)
                 break
             except:
                 print('\033[91m' + "The input is not an integer number" + '\033[0m' + " -> try again")
 
-        if(tot_n_rooms < 1 or tot_n_rooms > 10):
+        if(tot_n_rooms < 1 or tot_n_rooms > 9):
             print('\033[91m' + "The input is out of bounds" + '\033[0m' + " -> try again")
         else:
             break
@@ -333,7 +337,7 @@ def cancel_control_goals():
     """
 
     print("")
-    print('\033[92m' + "Cancelling previous control goals..." + '\033[0m')
+    print("> Cancelling previous control goals...")
 
     actcli_control.wait_for_server()
     actcli_control.cancel_all_goals() #cancel all previous control goals
@@ -356,7 +360,7 @@ def plan(location):
     """
 
     print("")
-    print('\033[92m' + "Evaluating a path towards the location " + location + "..." + '\033[0m')
+    print("> Evaluating a path towards the location " + location + "...")
 
     # set the desired planning goal
     goal_planner = PlanGoal()
@@ -389,7 +393,7 @@ def control(via_points_list):
     """
 
     print("")
-    print('\033[92m' + "Controlling the robot towards the desired location..." + '\033[0m')
+    print("> Controlling the robot towards the desired location...")
 
     actcli_control.wait_for_server()
     # Send the via points list retrieved by the planner to the controller
@@ -453,9 +457,8 @@ class BuildEnvironment(smach.State,EnvironmentOntology):
         global transition
         global mutex
 
-        print('----------------------------------------------------------------')
-        rospy.loginfo('Executing state BUILDENVIRONMENT (the previous state was: %d)'%userdata.buildenvironment_prevstate_in)
-        print('----------------------------------------------------------------')
+        rospy.loginfo('Executing state ' + '\033[93m' + 'BUILDENVIRONMENT ' + '\033[0m' + '(the previous state was: %d)'%userdata.buildenvironment_prevstate_in)
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
 
         print("")
@@ -495,6 +498,7 @@ class BuildEnvironment(smach.State,EnvironmentOntology):
 
         userdata.buildenvironment_prevstate_out = 0
         print("\n")
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         return transition
 
@@ -552,9 +556,8 @@ class Reason(smach.State,EnvironmentOntology):
         global transition
         global mutex
 
-        print('----------------------------------------------------------------')
-        rospy.loginfo('Executing state REASON (the previous state was: %d)'%userdata.reason_prevstate_in)
-        print('----------------------------------------------------------------')
+        rospy.loginfo('Executing state ' + '\033[93m' + 'REASON ' + '\033[0m' + '(the previous state was: %d)'%userdata.reason_prevstate_in)
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         mutex.acquire()
         try:
@@ -566,7 +569,7 @@ class Reason(smach.State,EnvironmentOntology):
         # --------------------
 
         print("")
-        print('\033[92m' + "Reasoning..." + '\033[0m')
+        print("> Reasoning...")
 
         target_location = self.urgent_check() # this function is atomic: can't be interrupted by a battery_low signal
 
@@ -580,7 +583,8 @@ class Reason(smach.State,EnvironmentOntology):
         
         userdata.reason_prevstate_out = 1
         print("\n")
-
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
+        
         return transition
 
 # define state Charge
@@ -640,9 +644,8 @@ class Charge(smach.State,EnvironmentOntology):
         global transition
         global mutex
 
-        print('----------------------------------------------------------------')
-        rospy.loginfo('Executing state CHARGE (the previous state was: %d)'%userdata.charge_prevstate_in)
-        print('----------------------------------------------------------------')
+        rospy.loginfo('Executing state ' + '\033[93m' + 'CHARGE ' + '\033[0m' + '(the previous state was: %d)'%userdata.charge_prevstate_in)
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         mutex.acquire()
         try:
@@ -659,12 +662,21 @@ class Charge(smach.State,EnvironmentOntology):
         # Wait some time (5 seconds by default) if the transition global variable remains 'no_transition'
         # This procedure of waiting is implemented to be NOT atomic, since hypothetically it can happen that a battery_low signal randomly arrives
         print("")
-        print('\033[92m' + "Waiting {0} seconds for letting the battery recharge...".format(self.charge_time) + '\033[0m')
+        print("> Waiting {0} seconds for letting the battery recharge...".format(self.charge_time))
+
+        sys.stdout.write('\033[92m' + "Battery: " + "[%s]" % (" " * (5*10)) + '\033[0m')
+        sys.stdout.flush()
+        sys.stdout.write("\b" * (5*10+1))
+
         while(self.loop_count < 10):
             mutex.acquire()
             # print('\033[93m' + "\nstate Charge got the mutex (2)" + '\033[0m') # DEBUG
             if(transition == 'no_transition'): # wait charge_time/10 sec and check the transition global variable again
                 mutex.release()
+
+                sys.stdout.write('\033[92m' + "+++++" + '\033[0m')
+                sys.stdout.flush()
+
                 time.sleep(self.charge_time/10)
                 self.loop_count = self.loop_count+1
             else:
@@ -681,7 +693,7 @@ class Charge(smach.State,EnvironmentOntology):
 
         # Update the visitedAt property of the charging room
         print("")
-        print('\033[92m' + "Updating the visitedAt timestamp of the charging room to the instant the robot exits the state 'Charge'..." + '\033[0m')
+        print("> Updating the visitedAt timestamp of the charging room to the instant the robot exits the state 'Charge'...")
         self.update_room_stamp()
 
         # --------------------
@@ -689,6 +701,7 @@ class Charge(smach.State,EnvironmentOntology):
         userdata.charge_targetloc_out = "" # yield as output shared variable an empty string, since no target location has to be passed to the next state
         userdata.charge_prevstate_out = 2
         print("\n")
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         return transition
 
@@ -750,9 +763,8 @@ class Navigate(smach.State,EnvironmentOntology):
         global transition
         global mutex
 
-        print('----------------------------------------------------------------')
-        rospy.loginfo('Executing state NAVIGATE (the previous state was: %d)'%userdata.navigate_prevstate_in)
-        print('----------------------------------------------------------------')
+        rospy.loginfo('Executing state ' + '\033[93m' + 'NAVIGATE ' + '\033[0m' + '(the previous state was: %d)'%userdata.navigate_prevstate_in)
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         mutex.acquire()
         try:
@@ -765,7 +777,7 @@ class Navigate(smach.State,EnvironmentOntology):
 
         # Update the visitedAt property of the location that the robot is leaving
         print("")
-        print('\033[92m' + "Updating the visitedAt timestamp of the location to the instant the robot starts leaving it..." + '\033[0m')
+        print("> Updating the visitedAt timestamp of the location to the instant the robot starts leaving it...")
         self.update_room_stamp()
 
         # --------------------
@@ -773,8 +785,8 @@ class Navigate(smach.State,EnvironmentOntology):
         # Make a request to the planning server
         via_points_list = plan(userdata.navigate_targetloc_in) # this function is atomic: can't be interrupted by a battery_low signal
 
-        print("The path to location " + userdata.navigate_targetloc_in + " has been generated...")
-        print(via_points_list)
+        print("The path to location " + userdata.navigate_targetloc_in + " has been generated")
+        # print(via_points_list) # DEBUG
 
         # --------------------
 
@@ -808,6 +820,7 @@ class Navigate(smach.State,EnvironmentOntology):
         userdata.navigate_targetloc_out = "" # yield as output shared variable an empty string, since no target location has to be passed to the next state
         userdata.navigate_prevstate_out = 3
         print("\n")
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         return transition
 
@@ -870,9 +883,8 @@ class NavigatetoCharge(smach.State,EnvironmentOntology):
         global transition
         global mutex
 
-        print('----------------------------------------------------------------')
-        rospy.loginfo('Executing state NAVIGATETOCHARGE (the previous state was: %d)'%userdata.navigatetocharge_prevstate_in)
-        print('----------------------------------------------------------------')
+        rospy.loginfo('Executing state ' + '\033[93m' + 'NAVIGATETOCHARGE ' + '\033[0m' + '(the previous state was: %d)'%userdata.navigatetocharge_prevstate_in)
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         mutex.acquire()
         try:
@@ -892,7 +904,7 @@ class NavigatetoCharge(smach.State,EnvironmentOntology):
 
             # Update the visitedAt property of the location that the robot is leaving
             print("")
-            print('\033[92m' + "Updating the visitedAt timestamp of the location to the instant the robot starts leaving it..." + '\033[0m')
+            print("> Updating the visitedAt timestamp of the location to the instant the robot starts leaving it...")
             current_location = self.update_room_stamp()
 
             # --------------------
@@ -902,8 +914,8 @@ class NavigatetoCharge(smach.State,EnvironmentOntology):
                 # Make a request to the planning server
                 via_points_list = plan('E0') # this function is atomic: can't be interrupted by a battery_low signal
 
-                print("The path to location E0 has been generated...")
-                print(via_points_list)
+                print("The path to location E0 has been generated")
+                # print(via_points_list) # DEBUG
 
                 # --------------------
 
@@ -950,6 +962,7 @@ class NavigatetoCharge(smach.State,EnvironmentOntology):
         userdata.navigatetocharge_targetloc_out = "" # yield as output shared variable an empty string, since no target location has to be passed to the next state
         userdata.navigatetocharge_prevstate_out = 4
         print("\n")
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
 
         return transition
 
@@ -1011,10 +1024,8 @@ class Wait(smach.State,EnvironmentOntology):
         global transition
         global mutex
         
-
-        print('----------------------------------------------------------------')
-        rospy.loginfo('Executing state WAIT (the previous state was: %d)'%userdata.wait_prevstate_in)
-        print('----------------------------------------------------------------')
+        rospy.loginfo('Executing state ' + '\033[93m' + 'WAIT ' + '\033[0m' + '(the previous state was: %d)'%userdata.wait_prevstate_in)
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m')  
 
         mutex.acquire()
         try:
@@ -1032,12 +1043,21 @@ class Wait(smach.State,EnvironmentOntology):
         # This procedure of waiting is implemented to be NOT atomic, since hypothetically the robot doesn't just wait, but explores the room, so it can
         # happen that a battery_low signal arrives
         print("")
-        print('\033[92m' + "Waiting {0} seconds for exploring the reached location...".format(self.explore_time) + '\033[0m')
+        print("> Waiting {0} seconds for exploring the reached location...".format(self.explore_time))
+
+        sys.stdout.write('\033[94m' + "Exploration: " "[%s]" % (" " * (5*10)) + '\033[0m')
+        sys.stdout.flush()
+        sys.stdout.write("\b" * (5*10+1))
+
         while(self.loop_count < 10):
             mutex.acquire()
             # print('\033[93m' + "\nstate Wait got the mutex (2)" + '\033[0m') # DEBUG
             if(transition == 'no_transition'): # wait explore_time/10 sec and check the transition global variable again
                 mutex.release()
+
+                sys.stdout.write('\033[94m' + "#####" + '\033[0m')
+                sys.stdout.flush()
+
                 time.sleep(self.explore_time/10)
                 self.loop_count = self.loop_count+1
             else:
@@ -1054,7 +1074,7 @@ class Wait(smach.State,EnvironmentOntology):
 
         # Update the visitedAt property of the location that the robot reached
         print("")
-        print('\033[92m' + "Updating the visitedAt timestamp of the location to the instant the robot exits the state 'Wait'..." + '\033[0m')
+        print("> Updating the visitedAt timestamp of the location to the instant the robot exits the state 'Wait'...")
         self.update_room_stamp()
 
         # --------------------
@@ -1062,6 +1082,7 @@ class Wait(smach.State,EnvironmentOntology):
         userdata.wait_targetloc_out = "" # yield as output shared variable an empty string, since no target location has to be passed to the next state       
         userdata.wait_prevstate_out = 5
         print("\n")
+        print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m')  
 
         return transition
 
@@ -1079,6 +1100,7 @@ def main():
     # DEFINE SUBSCRIBERS ---------------------------------------------------------------------------
     sub_batterylow = rospy.Subscriber('/state/battery_low', Bool, clbk_battery) #define and initialize the subscriber to the topic '/state/battery_low'
 
+    print('\033[93m' + '-----------------------------------------------------------------------------' + '\033[0m') 
     # CREATE A SMACH STATE MACHINE -----------------------------------------------------------------------------------------
     sm = smach.StateMachine(outcomes=['container_interface'])
     sm.userdata.sm_targetloc = "" # variable shared among all states -> it contains the target location to reach. At the beginning it is "".

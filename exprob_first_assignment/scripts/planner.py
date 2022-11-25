@@ -100,7 +100,7 @@ class PlaningAction(object):
         """
 
         # Get the input parameters to compute the plan, i.e., the start (or current) and target positions.
-        start_point = _get_pose_client()
+        start_point = get_pose_client()
         # target_point = goal.target
         target_location = goal.location
 
@@ -169,7 +169,7 @@ class PlaningAction(object):
 
 
 # Retrieve the current robot pose by the `state/get_pose` server of the `robot-state` node.
-def _get_pose_client():
+def get_pose_client():
 
     """ Function that is called whenever the action server determines a path towards a target location.
 

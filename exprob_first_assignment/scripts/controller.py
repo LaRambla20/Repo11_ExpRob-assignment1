@@ -116,7 +116,7 @@ class ControllingAction(object):
             feedback.reached_point = point
             self._as.publish_feedback(feedback)
             # Set the new current position into the `robot-state` node.
-            _set_pose_client(point)
+            set_pose_client(point)
             # Log current robot position.
             log_msg = 'Reaching point (%f, %f).' % (point.x, point.y)
             rospy.loginfo(anm.tag_log(log_msg, LOG_TAG))
@@ -131,7 +131,7 @@ class ControllingAction(object):
 
 # Update the current robot `pose` stored in the `robot-state` node.
 # This method is performed for each point provided in the action's server feedback.
-def _set_pose_client(pose):
+def set_pose_client(pose):
 
     """ Function that is called whenever the action server simulates the reaching of a path via-point.
 

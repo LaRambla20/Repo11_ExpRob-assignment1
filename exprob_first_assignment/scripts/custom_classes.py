@@ -141,10 +141,10 @@ class EnvironmentOntology():
             for i in range(0,tot_n_corridors): # consider one of the corridors out of the list
                 for j in range(door_to_be_used,door_to_be_used+rooms_corridor[i,0]): # add a connection to all the rooms
                     #---
-                    print("query (hasDoor;" + corridors_list[i] + ";" + doors_list[j] + ")")
+                    # print("query (hasDoor;" + corridors_list[i] + ";" + doors_list[j] + ")") # DEBUG
                     self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor',corridors_list[i],doors_list[j]])
                     #---
-                    print("query (hasDoor;" + rooms_list[j] + ";" + doors_list[j] + ")")
+                    # print("query (hasDoor;" + rooms_list[j] + ";" + doors_list[j] + ")") # DEBUG
                     self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor',rooms_list[j],doors_list[j]])
                     #---
                 door_to_be_used = door_to_be_used + rooms_corridor[i,0]
@@ -154,10 +154,10 @@ class EnvironmentOntology():
             print("- Connecting rooms to the charging room:")
             for i in range(0,n_rooms_left): #consider the remaining rooms
                 #---
-                print("query (hasDoor;" + rooms_list[door_to_be_used] + ";" + doors_list[door_to_be_used] + ")") # add the connection to the charging room
+                # print("query (hasDoor;" + rooms_list[door_to_be_used] + ";" + doors_list[door_to_be_used] + ")") # add the connection to the charging room # DEBUG
                 self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor',rooms_list[door_to_be_used],doors_list[door_to_be_used]])
                 #---
-                print("query (hasDoor;E0;" + doors_list[door_to_be_used] + ")")
+                # print("query (hasDoor;E0;" + doors_list[door_to_be_used] + ")") # DEBUG
                 self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor','E0',doors_list[door_to_be_used]])
                 #---
                 door_to_be_used = door_to_be_used + 1
@@ -167,10 +167,10 @@ class EnvironmentOntology():
             print("- Connecting corridors (if any) to the charging room:")
             for i in range(0,tot_n_corridors): #consider one of the corridors out of the list
                 #---
-                print("query (hasDoor;" + corridors_list[i] + ";" + doors_list[door_to_be_used] + ")") # add the connection to the charging room
+                # print("query (hasDoor;" + corridors_list[i] + ";" + doors_list[door_to_be_used] + ")") # add the connection to the charging room # DEBUG
                 self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor',corridors_list[i],doors_list[door_to_be_used]])
                 #---
-                print("query (hasDoor;E0;" + doors_list[door_to_be_used] + ")")
+                # print("query (hasDoor;E0;" + doors_list[door_to_be_used] + ")") # DEBUG
                 self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor','E0',doors_list[door_to_be_used]])
                 #---
                 door_to_be_used = door_to_be_used + 1
@@ -181,10 +181,10 @@ class EnvironmentOntology():
             for i in range(0,len(connection)):
                 if connection[i,0]==True: # add the connections between corridors
                     #---
-                    print("query (hasDoor;" + corridors_list[i] + ";" + doors_list[door_to_be_used] + ")")
+                    # print("query (hasDoor;" + corridors_list[i] + ";" + doors_list[door_to_be_used] + ")") # DEBUG
                     self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor',corridors_list[i],doors_list[door_to_be_used]])
                     #---
-                    print("query (hasDoor;" + corridors_list[i+1] + ";" + doors_list[door_to_be_used] + ")")
+                    # print("query (hasDoor;" + corridors_list[i+1] + ";" + doors_list[door_to_be_used] + ")") # DEBUG
                     self.send_armor_request('ADD','OBJECTPROP','IND',['hasDoor',corridors_list[i+1],doors_list[door_to_be_used]])
                     #---
                     door_to_be_used = door_to_be_used + 1
@@ -193,7 +193,7 @@ class EnvironmentOntology():
         print("- Finished adding locations and doors... Making them disjointed...")
         # print("door to be used next {0}".format(door_to_be_used)) # DEBUG
 
-        print(['E0',*doors_list,*corridors_list,*rooms_list])
+        # print(['E0',*doors_list,*corridors_list,*rooms_list]) # DEBUG
         self.send_armor_request('DISJOINT','IND','',['E0',*doors_list,*corridors_list,*rooms_list])
 
         #---
@@ -204,7 +204,7 @@ class EnvironmentOntology():
         #---
         print("- Initialising the timestamp associated to the visitedAt property of all the locations...")
 
-        initial_visited_stamp="{}".format(int(time.time())) # string containing the seconds elapsed since 1960 without decimals
+        initial_visited_stamp="{}".format(0)
 
         for location in ['E0',*corridors_list,*rooms_list]:
             self.send_armor_request('ADD','DATAPROP','IND',['visitedAt', location, 'Long', initial_visited_stamp])
@@ -238,7 +238,7 @@ class EnvironmentOntology():
         """
 
         print("")
-        print('\033[92m' + "Checking whether there are URGENT adjacent locations or not..." + '\033[0m')
+        print("> Checking whether there are URGENT adjacent locations or not...")
 
         #---
         print("- Evaluating the locations that the robot can reach...")
@@ -249,28 +249,31 @@ class EnvironmentOntology():
         random.shuffle(adjacent_locations_list) # shuffle the list of adjacent locations so as to avoid to select always the same urgent location/corridor
 
         for i in range(0, len(adjacent_locations_list)):
-            print (adjacent_locations_list[i][32:34])
+            print ('   ' + adjacent_locations_list[i][32:34])
 
         inspected_location=""
+        inspected_corridor=""
 
         #---
-        print("- Checking the urgency of the locations that the robot can reach...")
+        # print("- Checking the urgency of the locations that the robot can reach...") # DEBUG
         for i in range(0, len(adjacent_locations_list)):
             inspected_location = adjacent_locations_list[i][32:34]
-            print ("Checking location " + inspected_location + " urgency...")
+            # print ("Checking location " + inspected_location + " urgency...") # DEBUG
 
             res2 = self.send_armor_request('QUERY','CLASS','IND',[inspected_location, 'false'])
 
             for j in range(0, len(res2.armor_response.queried_objects)):
                 inspected_class = res2.armor_response.queried_objects[j].split('#')[1][:-1] # consider the part of the string after the '#' symbol, without the last term
-                print(inspected_class)
+                # print(inspected_class) # DEBUG
                 if(inspected_class == 'CORRIDOR'):
                     inspected_corridor = inspected_location # keep track of the last corridor you inspected
                 if(inspected_class == 'URGENT'):
-                    print("URGENT location detected -> setting " + inspected_location + " as target")
+                    print("")
+                    print('\033[91m' +"URGENT " + '\033[0m' + "location detected -> setting " + inspected_location + " as target")
                     return(inspected_location)
 
-        print('\033[91m' +"NO " + '\033[0m' + "URGENT location  detected -> setting " + inspected_corridor + " as target")
+        print("")
+        print('\033[91m' +"NO URGENT " + '\033[0m' + "location  detected -> setting " + inspected_corridor + " as target")
         return(inspected_corridor) # if I exited both for loops it means that I didn't find any urgent room
 
     #----------------------------------------------------------------------------
@@ -293,30 +296,30 @@ class EnvironmentOntology():
         """
     
         #---
-        print("- Retrieving the current robot position...")
+        # print("- Retrieving the current robot position...") # DEBUG
 
         res = self.send_armor_request('QUERY','OBJECTPROP','IND',['isIn', 'Robot1'])
 
-        print(res.armor_response.queried_objects[0][32:34]) #from the string extract the second to last and third to last term
+        # print(res.armor_response.queried_objects[0][32:34]) #from the string extract the second to last and third to last term # DEBUG
 
         current_location = res.armor_response.queried_objects[0][32:34]
 
         #---
-        print("- Retrieving the timestamp of the last time the robot visited location " + current_location + "...")
+        # print("- Retrieving the timestamp of the last time the robot visited location " + current_location + "...") # DEBUG
 
         res = self.send_armor_request('QUERY','DATAPROP','IND',['visitedAt', current_location])
 
         old_visited_stamp = res.armor_response.queried_objects[0].split('"')[1]
         new_visited_stamp = "{}".format(int(time.time()))
-        print("Before: "+old_visited_stamp+"\nNow: "+new_visited_stamp)
+        # print("Before: "+old_visited_stamp+"\nNow: "+new_visited_stamp) # DEBUG
 
         #---
-        print("- Updating the timestamp of the last time the robot visited location " + current_location + "...")
+        # print("- Updating the timestamp of the last time the robot visited location " + current_location + "...") # DEBUG
 
         res = self.send_armor_request('REPLACE','DATAPROP','IND',['visitedAt', current_location, 'Long', new_visited_stamp, old_visited_stamp])
 
         #---
-        print("- Reasoning...")
+        # print("- Reasoning...") # DEBUG
 
         self.send_armor_request('REASON','','',[''])
 
@@ -338,24 +341,24 @@ class EnvironmentOntology():
         """
 
         print("")
-        print('\033[92m' + "Updating the now timestamp of the robot to the instant the robot reached the location..." + '\033[0m')
+        print("> Updating the Now timestamp of the robot to the instant the robot reached the location...")
 
         #---
-        print("- Retrieving the timestamp of the last time the robot moved...")
+        # print("- Retrieving the timestamp of the last time the robot moved...") # DEBUG
 
         res = self.send_armor_request('QUERY','DATAPROP','IND',['now', 'Robot1'])
 
         old_now_stamp = res.armor_response.queried_objects[0].split('"')[1]
         new_now_stamp = "{}".format(int(time.time()))
-        print("Before: "+old_now_stamp+"\nNow: "+new_now_stamp)
+        # print("Before: "+old_now_stamp+"\nNow: "+new_now_stamp) # DEBUG
 
         #---
-        print("- Updating the timestamp of the last time the robot moved...")
+        # print("- Updating the timestamp of the last time the robot moved...") # DEBUG
 
         res = self.send_armor_request('REPLACE','DATAPROP','IND',['now', 'Robot1', 'Long', new_now_stamp, old_now_stamp])
 
         #---
-        print("- Reasoning...")
+        # print("- Reasoning...") # DEBUG
 
         self.send_armor_request('REASON','','',[''])
 
@@ -376,23 +379,23 @@ class EnvironmentOntology():
         """
 
         print("")
-        print('\033[92m' + "Updating the robot location..." + '\033[0m')
+        print("> Updating the robot location...")
 
         #---
-        print("- Retrieving the past robot location...")
+        # print("- Retrieving the past robot location...") # DEBUG
 
         res = self.send_armor_request('QUERY','OBJECTPROP','IND',['isIn', 'Robot1'])
 
-        print(res.armor_response.queried_objects[0][32:34]) #from the string extract the second to last and third to last term
+        # print(res.armor_response.queried_objects[0][32:34]) #from the string extract the second to last and third to last term # DEBUG
 
         starting_location = res.armor_response.queried_objects[0][32:34]
 
         #---
-        print("- Updating the robot location from " + starting_location + " to "+ reached_location)
+        # print("- Updating the robot location from " + starting_location + " to "+ reached_location) # DEBUG
 
         res = self.send_armor_request('REPLACE','OBJECTPROP','IND',['isIn', 'Robot1',  reached_location, starting_location])
 
         #---
-        print("- Reasoning...")
+        # print("- Reasoning...") # DEBUG
 
         self.send_armor_request('REASON','','',[''])
