@@ -11,18 +11,19 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import subprocess
 import sys
 sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'first_exprob_assignment'
+project = 'exprob_first_assignment'
 copyright = '2022, Emanuele Rambaldi'
 author = 'Emanuele Rambaldi'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '2.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -58,7 +59,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-highlight_language = 'c++'
+highlight_language = 'python'
 source_suffix = '.rst'
 master_doc = 'index'
 html_theme = 'sphinx_rtd_theme'

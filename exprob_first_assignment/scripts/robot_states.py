@@ -24,7 +24,7 @@ import rospy
 # Import constant name defined to structure the architecture.
 import sys
 sys.path.append('/home/emanuelerambaldi/ROS/my_ros_ws/src/exprob_first_assignment/scripts')
-import architecture_name_mapper as anm
+from . import architecture_name_mapper as anm
 # Import the messages used by services and publishers.
 from std_msgs.msg import Bool
 # from arch_skeleton.srv import GetPose, GetPoseResponse, SetPose, SetPoseResponse
