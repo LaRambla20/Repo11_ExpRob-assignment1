@@ -23,7 +23,7 @@ import rospy
 # Import constant name defined to structure the architecture.
 import sys
 sys.path.append('/home/emanuelerambaldi/ROS/my_ros_ws/src/exprob_first_assignment/scripts')
-from . import architecture_name_mapper as anm
+import architecture_name_mapper as anm
 # Import the ActionServer implementation used.
 from actionlib import SimpleActionServer
 # Import custom message, actions and services.

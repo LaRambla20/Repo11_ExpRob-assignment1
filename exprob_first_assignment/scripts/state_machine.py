@@ -43,7 +43,7 @@ Action client:
 # IMPORTS
 
 import sys
-from .custom_classes import EnvironmentOntology # import the EnvironmentOntology class to define a new ontology and interact with it
+from custom_classes import EnvironmentOntology # import the EnvironmentOntology class to define a new ontology and interact with it
 
 import numpy as np
 from http.client import USE_PROXY
